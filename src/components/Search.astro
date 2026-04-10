@@ -1,0 +1,292 @@
+---
+---
+
+<div
+    x-data="{
+        open: false,
+        focused: false,
+        query: '',
+        loading: false,
+        results: [],
+        popular: [],
+        fallbackIndex: [],
+        fallbackLoadState: 'idle',
+        fallbackPromise: null,
+        pagefindStatus: 'unknown',
+        searchRequestId: 0,
+        fallbackReported: false,
+        init() {
+            this.ensureFallbackData();
+        },
+        async ensureFallbackData() {
+            if (this.fallbackLoadState === 'ready') return true;
+            if (this.fallbackLoadState === 'loading' && this.fallbackPromise) {
+                await this.fallbackPromise;
+                return this.fallbackLoadState === 'ready';
+            }
+
+            this.fallbackLoadState = 'loading';
+            this.fallbackPromise = fetch('/search-index.json')
+                .then((res) => {
+                    if (!res.ok) {
+                        throw new Error(`Fallback index request failed (${res.status})`);
+                    }
+                    return res.json();
+                })
+                .then((payload) => {
+                    this.fallbackIndex = Array.isArray(payload?.docs) ? payload.docs : [];
+                    this.popular = Array.isArray(payload?.popular) ? payload.popular : [];
+                    this.fallbackLoadState = 'ready';
+                })
+                .catch((error) => {
+                    console.error('Fallback search index failed to load:', error);
+                    this.fallbackLoadState = 'error';
+                    this.fallbackIndex = [];
+                    this.popular = [];
+                });
+
+            await this.fallbackPromise;
+            return this.fallbackLoadState === 'ready';
+        },
+        scoreFallbackItem(item, q, tokens) {
+            const title = (item.title || '').toLowerCase();
+            const excerpt = (item.excerpt || '').toLowerCase();
+            const category = (item.category || '').toLowerCase();
+
+            let score = 0;
+            if (title === q) score += 300;
+            if (title.startsWith(q)) score += 180;
+            if (title.includes(q)) score += 120;
+            if (category.includes(q)) score += 50;
+            if (excerpt.includes(q)) score += 35;
+
+            for (const token of tokens) {
+                if (title.startsWith(token)) score += 50;
+                else if (title.includes(token)) score += 30;
+                if (category.includes(token)) score += 10;
+                if (excerpt.includes(token)) score += 8;
+            }
+
+            return score;
+        },
+        fallbackSearch(term) {
+            const q = term.trim().toLowerCase();
+            if (!q) return [];
+            const tokens = q.split(/\s+/).filter(Boolean);
+
+            return this.fallbackIndex
+                .map((item) => ({
+                    item,
+                    score: this.scoreFallbackItem(item, q, tokens),
+                }))
+                .filter((entry) => entry.score > 0)
+                .sort((a, b) => {
+                    if (b.score !== a.score) return b.score - a.score;
+                    return a.item.title.localeCompare(b.item.title);
+                })
+                .slice(0, 8)
+                .map(({ item }) => ({
+                    url: item.url,
+                    title: item.title,
+                    excerptText: item.excerpt,
+                }));
+        },
+        reportFallback(reason) {
+            if (this.fallbackReported) return;
+            this.fallbackReported = true;
+            window.dispatchEvent(
+                new CustomEvent('sgkb:search:fallback', {
+                    detail: { reason },
+                }),
+            );
+            console.info('Search fallback enabled:', reason);
+        },
+        async ensurePagefind() {
+            if (this.pagefindStatus === 'ready') return true;
+            if (this.pagefindStatus === 'unavailable') return false;
+            if (typeof window.pagefind !== 'undefined') {
+                this.pagefindStatus = 'ready';
+                return true;
+            }
+            try {
+                window.pagefind = await import('/pagefind/pagefind.js');
+                await window.pagefind.init();
+                this.pagefindStatus = 'ready';
+                return true;
+            } catch {
+                this.pagefindStatus = 'unavailable';
+                return false;
+            }
+        },
+        async runFallbackSearch(query, reason, requestId) {
+            const hasIndex = await this.ensureFallbackData();
+            if (requestId !== this.searchRequestId) return;
+            if (!hasIndex) {
+                this.results = [];
+                this.loading = false;
+                return;
+            }
+            this.reportFallback(reason);
+            this.results = this.fallbackSearch(query);
+            this.loading = false;
+        },
+        async search() {
+            const requestId = ++this.searchRequestId;
+            this.open = true;
+
+            const query = this.query.trim();
+            if (!query) {
+                this.results = [];
+                this.loading = false;
+                return;
+            }
+
+            this.loading = true;
+            const pagefindReady = await this.ensurePagefind();
+            if (requestId !== this.searchRequestId) return;
+
+            if (!pagefindReady) {
+                await this.runFallbackSearch(query, 'pagefind-unavailable', requestId);
+                return;
+            }
+
+            try {
+                const found = await window.pagefind.search(query);
+                if (requestId !== this.searchRequestId) return;
+
+                const pagefindResults = await Promise.all(
+                    found.results.slice(0, 8).map((r) => r.data()),
+                );
+                if (requestId !== this.searchRequestId) return;
+
+                this.results = pagefindResults.map((result) => ({
+                    url: result.url,
+                    title: result.meta?.title || 'Untitled',
+                    excerptText: result.excerpt?.replace(/<[^>]*>/g, '') || '',
+                }));
+                this.loading = false;
+            } catch {
+                await this.runFallbackSearch(query, 'pagefind-search-error', requestId);
+            }
+        },
+        async searchFromButton() {
+            this.open = true;
+            await this.search();
+            this.$refs.searchInput?.focus();
+        },
+        async usePopular(term) {
+            this.query = term;
+            await this.search();
+        }
+    }"
+    @click.outside="open = false"
+    @keydown.escape="open = false"
+    class="relative w-full max-w-[600px] mx-auto"
+>
+    <div
+        class="flex items-center bg-white rounded-[12px] p-[6px] transition-all duration-200"
+        :style="focused ? 'box-shadow: var(--sgkb-search-focus-shadow); transform: translateY(-2px);' : ''"
+    >
+        <input
+            x-ref="searchInput"
+            type="text"
+            x-model="query"
+            @focus="focused = true; open = true; ensureFallbackData()"
+            @blur="focused = false"
+            @click="open = true"
+            @input="loading = query.trim().length > 0"
+            @input.debounce.250ms="search()"
+            @keydown.enter.prevent="searchFromButton()"
+            placeholder="Search for articles..."
+            class="w-full bg-transparent px-5 py-3 text-[var(--sgkb-text-tertiary)] font-normal placeholder:text-[var(--sgkb-text-tertiary)] placeholder:font-normal placeholder:opacity-100 outline-none font-['Poppins']"
+            style="font-size: var(--text-sm); line-height: var(--text-sm--line-height);"
+        />
+        <button
+            type="button"
+            @click="searchFromButton()"
+            class="flex items-center justify-center w-[44px] h-[44px] min-w-[44px] min-h-[44px] aspect-square shrink-0 bg-[var(--sgkb-primary)] rounded-full text-white cursor-pointer"
+            style="transition: var(--sgkb-transition-base);"
+            aria-label="Search"
+        >
+            <span class="relative inline-flex w-5 h-5 items-center justify-center">
+                <svg
+                    x-show="!loading"
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                >
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <path d="m21 21-4.3-4.3"></path>
+                </svg>
+                <span
+                    x-show="loading"
+                    class="inline-block w-5 h-5 rounded-full border-2 border-white/40 border-t-white animate-spin"
+                    style="display: none;"
+                ></span>
+            </span>
+        </button>
+    </div>
+
+    <div
+        x-show="open"
+        x-transition
+        class="absolute left-0 right-0 mt-2 bg-white rounded-xl border border-brand-gray-200 shadow-2xl overflow-hidden z-50"
+        style="display:none;"
+    >
+        <div class="px-4 py-3 border-b border-brand-gray-100 text-center text-[12px] font-semibold tracking-widest text-brand-gray-400 uppercase">
+            <span x-text="query.trim() ? 'Search Results' : 'Popular Searches'"></span>
+        </div>
+
+        <div class="max-h-[300px] overflow-y-auto">
+            <div x-show="loading" class="px-4 py-6 text-sm text-brand-gray-400">Searching...</div>
+
+            <template x-if="!loading && !query.trim()">
+                <ul class="py-2">
+                    <template x-for="term in popular" :key="term">
+                        <li>
+                            <button
+                                type="button"
+                                @click="usePopular(term)"
+                                class="w-full text-left px-4 py-2.5 text-sm text-brand-gray-600 hover:bg-brand-gray-50 transition-colors cursor-pointer"
+                            >
+                                <span class="inline-flex items-center gap-2">
+                                    <span class="inline-block w-1.5 h-1.5 rounded-full bg-brand-gray-300"></span>
+                                    <span x-text="term"></span>
+                                </span>
+                            </button>
+                        </li>
+                    </template>
+                </ul>
+            </template>
+
+            <template x-if="!loading && query.trim() && results.length > 0">
+                <ul class="py-2 text-left">
+                    <template x-for="result in results" :key="result.url">
+                        <li>
+                            <a
+                                :href="result.url"
+                                class="block px-4 py-3 hover:bg-brand-gray-50 transition-colors text-left"
+                            >
+                                <p class="text-sm font-semibold text-brand-gray-900 text-left" x-text="result.title"></p>
+                                <p class="text-xs text-brand-gray-500 mt-1 line-clamp-1 text-left" x-text="result.excerptText"></p>
+                            </a>
+                        </li>
+                    </template>
+                </ul>
+            </template>
+
+            <div
+                x-show="!loading && query.trim() && results.length === 0"
+                class="px-4 py-6 text-sm text-brand-gray-500"
+            >
+                No results found.
+            </div>
+        </div>
+    </div>
+</div>

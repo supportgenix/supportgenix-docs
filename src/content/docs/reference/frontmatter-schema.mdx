@@ -1,0 +1,105 @@
+---
+title: "Frontmatter Schema"
+description: "Complete reference for all available frontmatter fields in documentation articles."
+category: "Reference"
+order: 1
+publishedDate: 2026-01-04
+lastUpdated: 2026-01-04
+tags: ["frontmatter", "schema", "reference"]
+author: "Documentation Team"
+tableOfContents: true
+---
+
+## Schema Definition
+
+The content collection schema is defined in `src/content.config.ts` using Zod validation. Every MDX file in `src/content/docs/` is validated against this schema at build time.
+
+## Field Reference
+
+### title
+
+- **Type:** `string`
+- **Required:** Yes
+
+The article title. Displayed in the page header, sidebar, cards, browser tab, and SEO metadata.
+
+### description
+
+- **Type:** `string`
+- **Required:** Yes
+
+A short summary of the article. Used in article cards, the search index, and meta description tags.
+
+### category
+
+- **Type:** `string`
+- **Required:** Yes
+
+The category this article belongs to. Articles with the same category value are grouped together in the sidebar and on category listing pages.
+
+### order
+
+- **Type:** `number`
+- **Required:** No
+
+Controls the display order within a category. Lower numbers appear first. Articles without an order value are sorted alphabetically by title after ordered articles.
+
+### publishedDate
+
+- **Type:** `date`
+- **Required:** No
+
+The original publication date. Displayed on the article page and used for sorting related articles. Accepts ISO date strings (e.g., `2026-01-15`).
+
+### lastUpdated
+
+- **Type:** `date`
+- **Required:** No
+
+The date the article was last modified. Displayed alongside the published date on the article page.
+
+### tags
+
+- **Type:** `string[]`
+- **Required:** No
+
+An array of tags for categorization. Currently used in SEO metadata and can be leveraged for filtering in custom implementations.
+
+### author
+
+- **Type:** `string`
+- **Required:** No
+- **Default:** Value from `SITE_CONFIG.defaultAuthor`
+
+The author name displayed on the article page.
+
+### featuredImage
+
+- **Type:** `string`
+- **Required:** No
+
+Path to a featured image for the article. Can be used for article cards or Open Graph images.
+
+### tableOfContents
+
+- **Type:** `boolean`
+- **Required:** No
+
+Whether to display the table of contents sidebar on the article page. The table of contents is generated automatically from `##` and `###` headings in the article.
+
+## Example
+
+```mdx
+---
+title: "Complete Example Article"
+description: "This article demonstrates all available frontmatter fields"
+category: "Reference"
+order: 5
+publishedDate: 2026-01-01
+lastUpdated: 2026-01-15
+tags: ["example", "reference", "complete"]
+author: "Documentation Team"
+featuredImage: ""
+tableOfContents: true
+---
+```

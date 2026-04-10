@@ -1,0 +1,83 @@
+---
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import SEO from "../components/SEO.astro";
+import "../assets/styles/global.css";
+import "@fontsource/poppins/400.css";
+import "@fontsource/poppins/500.css";
+import "@fontsource/poppins/600.css";
+import "@fontsource/poppins/700.css";
+import "@fontsource/poppins/800.css";
+
+interface Props {
+	title: string;
+	description?: string;
+	image?: string;
+	articleData?: {
+		publishedTime?: string;
+		modifiedTime?: string;
+		author?: string;
+		tags?: string[];
+	};
+}
+
+const { title, description, image, articleData } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<SEO
+			title={title}
+			description={description}
+			image={image}
+			articleData={articleData}
+		/>
+
+		<link rel="icon" href="/favicon180x180.png" />
+		<link rel="icon" type="image/png" href="/favicon180x180.png" />
+		<link
+			rel="apple-touch-icon"
+			sizes="180x180"
+			href="/apple-touch-icon.png"
+		/>
+		<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+		<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+
+		<style is:global>
+			:root {
+				--primary: var(--color-secondary);
+				--primary-dark: var(--sgkb-secondary-dark);
+			}
+
+			html {
+				font-family: "Poppins", system-ui, sans-serif;
+				scroll-behavior: smooth;
+			}
+
+			/* Custom scrollbar */
+			::-webkit-scrollbar {
+				width: 8px;
+			}
+			::-webkit-scrollbar-track {
+				background: var(--sgkb-scrollbar-track);
+			}
+			::-webkit-scrollbar-thumb {
+				background: var(--sgkb-scrollbar-thumb);
+				border-radius: 4px;
+			}
+			::-webkit-scrollbar-thumb:hover {
+				background: var(--sgkb-scrollbar-thumb-hover);
+			}
+		</style>
+	</head>
+	<body
+		class="bg-brand-gray-50 text-brand-gray-900 antialiased min-h-screen flex flex-col"
+	>
+		<Header />
+		<main class="flex-grow">
+			<slot />
+		</main>
+		<Footer />
+	</body>
+</html>

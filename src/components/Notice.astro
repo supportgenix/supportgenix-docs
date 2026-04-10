@@ -1,0 +1,15 @@
+---
+import Alert from "./Alert.astro";
+
+interface Props {
+    type?: "info" | "warning" | "success" | "error" | "tip";
+    title?: string;
+    dismissible?: boolean;
+}
+
+const { type = "info", title, dismissible = false } = Astro.props;
+---
+
+<Alert type={type} title={title} dismissible={dismissible}>
+    <slot />
+</Alert>

@@ -1,0 +1,67 @@
+---
+title: "Installation"
+description: "How to install dependencies and run the project locally."
+category: "Getting Started"
+order: 2
+publishedDate: 2026-01-01
+lastUpdated: 2026-01-01
+tags: ["install", "setup", "quickstart"]
+author: "Documentation Team"
+tableOfContents: true
+---
+
+## Prerequisites
+
+Before you begin, make sure you have the following installed on your system:
+
+- **Node.js** version 22.12 or newer
+- **npm** version 9.6 or newer (npm 10+ recommended)
+
+You can verify your versions by running:
+
+```bash
+node --version
+npm --version
+```
+
+## Install Dependencies
+
+Clone the repository and install the required packages:
+
+```bash
+git clone https://github.com/your-username/your-repo.git
+cd your-repo
+npm install
+```
+
+## Start the Development Server
+
+Run the following command to start the local development server:
+
+```bash
+npm run dev
+```
+
+The site will be available at `http://localhost:4321`. The dev server supports hot reloading, so changes to your content and components will appear immediately.
+
+## Build for Production
+
+When you are ready to deploy, create a production build:
+
+```bash
+npm run build
+```
+
+This generates the static site in the `dist/` directory and also runs Pagefind to create the search index.
+
+## Preview the Build
+
+To preview the production build locally before deploying:
+
+```bash
+npm run preview
+```
+
+## Next Steps
+
+Once the project is running, head to the [Configuration](/docs/getting-started/configuration) guide to customize the site for your brand.

@@ -1,0 +1,418 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "../layouts/Layout.astro";
+import SearchHero from "../components/SearchHero.astro";
+import CategoryCard from "../components/CategoryCard.astro";
+import FeaturedCard from "../components/FeaturedCard.astro";
+import { getDocUrl } from "../lib/docs";
+
+const allDocs = await getCollection("docs");
+
+const categoriesMap = allDocs.reduce(
+  (acc, doc) => {
+    const category = doc.data.category || "Uncategorized";
+    if (!acc[category]) {
+      acc[category] = {
+        title: category,
+        description: `Comprehensive guides and tutorials for ${category}.`,
+        icon:
+          doc.data.category === "Tutorials"
+            ? '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>'
+            : '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>',
+        count: 0,
+        href: `/docs/category/${category.toLowerCase().replace(/\s+/g, "-")}`,
+        articles: [],
+      };
+    }
+    acc[category].count++;
+    if (acc[category].articles.length < 5) {
+      acc[category].articles.push({
+        title: doc.data.title,
+        href: getDocUrl(doc),
+      });
+    }
+    return acc;
+  },
+  {} as Record<string, any>,
+);
+
+interface Category {
+  title: string;
+  description: string;
+  icon: string;
+  count: number;
+  href: string;
+  articles: { title: string; href: string }[];
+}
+
+const allCategories = Object.values(categoriesMap) as Category[];
+const categoryOrder = [
+  "Basic",
+  "Email Piping",
+  "Integration",
+  "Knowledge Base",
+  "FAQs",
+];
+const sortedCategories = [...allCategories].sort((a, b) => {
+  const ai = categoryOrder.indexOf(a.title);
+  const bi = categoryOrder.indexOf(b.title);
+  const an = ai === -1 ? Number.MAX_SAFE_INTEGER : ai;
+  const bn = bi === -1 ? Number.MAX_SAFE_INTEGER : bi;
+  if (an === bn) return a.title.localeCompare(b.title);
+  return an - bn;
+});
+const firstCategoryHref =
+  sortedCategories[0]?.href ||
+  `/docs/category/${allCategories[0]?.title?.toLowerCase().replace(/\s+/g, "-")}`;
+
+interface FeaturedArticle {
+  title: string;
+  category: string;
+  date: string;
+  href: string;
+  description: string;
+}
+
+const featuredArticles = allDocs
+  .sort(
+    (a, b) =>
+      (b.data.lastUpdated?.getTime() || 0) -
+      (a.data.lastUpdated?.getTime() || 0),
+  )
+  .slice(0, 3)
+  .map((doc) => ({
+    title: doc.data.title,
+    category: doc.data.category,
+    date: doc.data.lastUpdated
+      ? new Intl.DateTimeFormat("en-US", {
+          month: "short",
+          day: "2-digit",
+          year: "numeric",
+        }).format(doc.data.lastUpdated)
+      : "Recently Updated",
+    href: getDocUrl(doc),
+    description:
+      doc.data.description ||
+      `Learn how to get started with ${doc.data.title} and optimize your workflow with SupportGenix.`,
+  })) as FeaturedArticle[];
+
+const recentlyUpdated = allDocs
+  .sort(
+    (a, b) =>
+      (b.data.lastUpdated?.getTime() || 0) -
+      (a.data.lastUpdated?.getTime() || 0),
+  )
+  .slice(0, 3)
+  .map((doc) => ({
+    title: doc.data.title,
+    category: doc.data.category || "General",
+    date: doc.data.lastUpdated
+      ? new Intl.DateTimeFormat("en-US", {
+          month: "short",
+          day: "2-digit",
+          year: "numeric",
+        }).format(doc.data.lastUpdated)
+      : "Recently Updated",
+    href: getDocUrl(doc),
+    description:
+      doc.data.description ||
+      `Learn more about ${doc.data.title} in our detailed guide.`,
+    timeAgo: doc.data.lastUpdated
+      ? getTimeAgo(doc.data.lastUpdated)
+      : "recently",
+  }));
+
+function getTimeAgo(date: Date): string {
+  const now = new Date();
+  const diff = now.getTime() - date.getTime();
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  if (days < 7) return `${days} days ago`;
+  const weeks = Math.floor(days / 7);
+  if (weeks < 5) return `${weeks} weeks ago`;
+  const months = Math.floor(days / 30);
+  return `${months} months ago`;
+}
+
+const popularArticles = allDocs.slice(0, 5).map((doc) => ({
+  title: doc.data.title,
+  href: getDocUrl(doc),
+  category: doc.data.category || "Basic",
+}));
+
+const categoryDescriptions: Record<string, string> = {
+  "Getting Started": "Installation, setup, and first steps to get your documentation site up and running.",
+  "Guides": "Step-by-step walkthroughs for writing content, adding images, and customizing the theme.",
+  "Features": "Details on built-in features including search, SEO, categories, and navigation.",
+  "Reference": "Technical reference for frontmatter schema, project structure, and deployment.",
+};
+---
+
+<Layout title="SupportGenix Docs">
+  <SearchHero
+    articleCount={allDocs.length}
+    categoryCount={allCategories.length}
+    lastUpdatedLabel={recentlyUpdated[0]?.timeAgo || "recently"}
+  />
+
+  <section class="py-14 bg-white">
+    <div class="container-wide">
+      <div class="flex flex-col lg:flex-row gap-10 lg:gap-12">
+        <aside
+          class="homepage-sidebar-scroll lg:w-[286px] xl:w-[300px] flex-shrink-0 lg:pr-6 lg:mr-1 lg:border-r lg:border-brand-gray-300 lg:overflow-y-auto lg:sticky lg:top-24 lg:max-h-[calc(100vh-7rem)]"
+        >
+          <div class="space-y-7">
+            <div
+              class="bg-white rounded-[18px] border border-brand-gray-200 shadow-[var(--sgkb-shadow-xs)] px-6 py-7"
+            >
+              <h4
+                class="flex items-center gap-2.5 text-base font-semibold text-brand-gray-900 mb-5"
+              >
+                <svg
+                  class="w-4 h-4 text-primary"
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M8 2.5V13.5M2.5 8H13.5"
+                    stroke="currentColor"
+                    stroke-width="1.75"
+                    stroke-linecap="round"></path>
+                </svg>
+                Quick Navigation
+              </h4>
+              <nav class="space-y-1.5">
+                {
+                  allCategories.map((cat) => (
+                    <a
+                      href={cat.href}
+                      class="group flex items-center justify-between gap-3 py-1.5 text-sm leading-7 text-brand-gray-500 hover:text-brand-gray-900 hover:translate-x-[3px] transition-all"
+                    >
+                      <span class="inline-flex items-center gap-3 min-w-0">
+                        <span class="w-[5px] h-[5px] rounded-full bg-primary flex-shrink-0" />
+                        <span class="font-medium tracking-[-0.01em] truncate">
+                          {cat.title}
+                        </span>
+                      </span>
+                      <span class="text-xs font-medium text-brand-gray-400 group-hover:text-brand-gray-900 transition-colors flex-shrink-0">
+                        {cat.count}
+                      </span>
+                    </a>
+                  ))
+                }
+              </nav>
+            </div>
+
+            <div
+              class="bg-white rounded-[18px] border border-brand-gray-200 shadow-[var(--sgkb-shadow-xs)] px-6 py-7"
+            >
+              <h4
+                class="flex items-center gap-2.5 text-base font-semibold text-brand-gray-900 mb-5"
+              >
+                <svg
+                  class="w-4 h-4 text-primary"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M12 3.5L14.76 9.09L21 10L16.5 14.38L17.56 20.5L12 17.58L6.44 20.5L7.5 14.38L3 10L9.24 9.09L12 3.5Z"
+                    stroke="currentColor"
+                    stroke-width="1.75"
+                    stroke-linejoin="round"></path>
+                </svg>
+                Popular Articles
+              </h4>
+              <div class="space-y-[18px]">
+                {
+                  popularArticles.map((article) => (
+                    <a
+                      href={article.href}
+                      class="group flex items-start gap-2.5 text-brand-gray-600 hover:text-brand-gray-900 transition-colors"
+                    >
+                      <svg
+                        class="w-[15px] h-[15px] text-[var(--sgkb-icon-muted)] mt-1 flex-shrink-0"
+                        viewBox="0 0 20 20"
+                        fill="none"
+                        aria-hidden="true"
+                      >
+                        <rect
+                          x="4.25"
+                          y="4.25"
+                          width="11.5"
+                          height="11.5"
+                          rx="1.5"
+                          stroke="currentColor"
+                          stroke-width="1.5"
+                        />
+                        <circle cx="10" cy="10" r="1.25" fill="currentColor" />
+                      </svg>
+                      <span class="min-w-0">
+                        <span class="block text-[14px] leading-[1.45] font-medium text-[var(--sgkb-text-subtle)] group-hover:text-brand-gray-900 transition-colors line-clamp-3">
+                          {article.title}
+                        </span>
+                        <span class="block mt-0.5 text-[12px] text-[var(--sgkb-icon-muted)] group-hover:text-brand-gray-900 transition-colors">
+                          {article.category}
+                        </span>
+                      </span>
+                    </a>
+                  ))
+                }
+              </div>
+            </div>
+          </div>
+        </aside>
+
+        <main class="flex-grow min-w-0">
+          <div class="mb-14">
+            <div
+              class="flex items-center justify-between border-b border-brand-gray-200 pb-5 mb-8"
+            >
+              <h2
+                class="text-[clamp(1.5rem,3vw,2rem)] font-semibold text-[var(--sgkb-text-primary)] m-0 leading-[1.3] tracking-[-0.01em]"
+              >
+                Featured Topics
+              </h2>
+              <a
+                href={firstCategoryHref}
+                class="text-[14px] font-[500] text-primary hover:text-primary-dark transition-colors"
+              >
+                View all &rarr;
+              </a>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {featuredArticles.map((article) => <FeaturedCard {...article} />)}
+            </div>
+          </div>
+
+          <div class="mb-14">
+            <div class="border-b border-brand-gray-200 pb-5 mb-8">
+              <h2
+                class="text-[clamp(1.5rem,3vw,2rem)] font-semibold text-[var(--sgkb-text-primary)] m-0 leading-[1.3] tracking-[-0.01em]"
+              >
+                Browse by Category
+              </h2>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {
+                allCategories.map((cat) => (
+                  <CategoryCard
+                    title={cat.title}
+                    description={
+                      categoryDescriptions[cat.title] || cat.description
+                    }
+                    icon={cat.icon}
+                    count={cat.count}
+                    href={cat.href}
+                    articles={cat.articles}
+                  />
+                ))
+              }
+            </div>
+          </div>
+
+          <div>
+            <div class="border-b border-brand-gray-200 pb-5 mb-8">
+              <h2
+                class="text-[clamp(1.5rem,3vw,2rem)] font-semibold text-[var(--sgkb-text-primary)] m-0 leading-[1.3] tracking-[-0.01em]"
+              >
+                Recently Updated
+              </h2>
+            </div>
+            <div class="space-y-6">
+              {
+                recentlyUpdated.map((article) => (
+                  <div class="block rounded-2xl border border-[var(--sgkb-border-soft)] bg-white px-6 py-7 transition-all hover:border-primary hover:shadow-[var(--sgkb-shadow-soft-lg)]">
+                    <h3 class="text-[20px] leading-[1.35] font-semibold text-brand-gray-900 mb-3">
+                      <a href={article.href} class="hover:text-primary transition-colors">
+                        {article.title}
+                      </a>
+                    </h3>
+                    <div class="flex flex-wrap items-center gap-2.5 text-[14px] leading-[1.4] text-brand-gray-400 mb-4">
+                      <span class="inline-flex items-center gap-1.5">
+                        <svg
+                          class="w-4 h-4 text-[var(--sgkb-icon-light)]"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          aria-hidden="true"
+                        >
+                          <circle
+                            cx="12"
+                            cy="12"
+                            r="9"
+                            stroke="currentColor"
+                            stroke-width="1.7"
+                          />
+                          <path
+                            d="M12 7.5V12L15 14"
+                            stroke="currentColor"
+                            stroke-width="1.7"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          />
+                        </svg>
+                        {article.timeAgo}
+                      </span>
+                      <span class="text-[var(--sgkb-divider-muted)]">·</span>
+                      <span class="inline-flex items-center gap-1.5">
+                        <svg
+                          class="w-4 h-4 text-[var(--sgkb-icon-light)]"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          aria-hidden="true"
+                        >
+                          <path
+                            d="M8 7h8M8 12h8M8 17h4"
+                            stroke="currentColor"
+                            stroke-width="1.7"
+                            stroke-linecap="round"
+                          />
+                        </svg>
+                        {article.category}
+                      </span>
+                    </div>
+                    <p class="text-[15px] leading-[1.65] text-brand-gray-500 line-clamp-2 m-0">
+                      {article.description}
+                    </p>
+                  </div>
+                ))
+              }
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  @media (min-width: 1024px) {
+    .homepage-sidebar-scroll {
+      scrollbar-width: thin;
+      scrollbar-color: var(--color-brand-gray-300) transparent;
+      -ms-overflow-style: auto;
+    }
+
+    .homepage-sidebar-scroll::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+
+    .homepage-sidebar-scroll::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .homepage-sidebar-scroll::-webkit-scrollbar-track-piece {
+      background: transparent;
+    }
+
+    .homepage-sidebar-scroll::-webkit-scrollbar-thumb {
+      background-color: var(--color-brand-gray-300);
+      border-radius: 9999px;
+    }
+
+    .homepage-sidebar-scroll::-webkit-scrollbar-corner {
+      background: transparent;
+    }
+  }
+</style>

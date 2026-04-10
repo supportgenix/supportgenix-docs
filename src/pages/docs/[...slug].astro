@@ -1,0 +1,106 @@
+---
+import { getCollection, render } from "astro:content";
+import type { CollectionEntry } from "astro:content";
+import DocsLayout from "../../layouts/DocsLayout.astro";
+import { getDocSlug, getDocUrl } from "../../lib/docs";
+
+export async function getStaticPaths() {
+    const docs = await getCollection("docs");
+    return docs.map((entry) => ({
+        params: { slug: getDocSlug(entry) },
+        props: { entry },
+    }));
+}
+
+interface Props {
+    entry: CollectionEntry<"docs">;
+}
+
+const { entry } = Astro.props;
+const { Content, headings } = await render(entry);
+const allDocs = await getCollection("docs");
+
+const wordCount = entry.body
+    ? entry.body.trim().split(/\s+/).filter(Boolean).length
+    : 0;
+const readTimeMinutes = Math.max(1, Math.ceil(wordCount / 200));
+
+const docsForNavigation = allDocs
+    .filter((doc) =>
+        entry.data.category ? doc.data.category === entry.data.category : true,
+    )
+    .sort((a, b) => {
+        const orderA = a.data.order ?? Number.MAX_SAFE_INTEGER;
+        const orderB = b.data.order ?? Number.MAX_SAFE_INTEGER;
+        if (orderA !== orderB) return orderA - orderB;
+        return a.data.title.localeCompare(b.data.title);
+    });
+
+const entrySlug = getDocSlug(entry);
+
+const currentIndex = docsForNavigation.findIndex((doc) => getDocSlug(doc) === entrySlug);
+const previousDoc = currentIndex > 0 ? docsForNavigation[currentIndex - 1] : undefined;
+const nextDoc =
+    currentIndex >= 0 && currentIndex < docsForNavigation.length - 1
+        ? docsForNavigation[currentIndex + 1]
+        : undefined;
+
+const relatedSameCategory = allDocs
+    .filter(
+        (doc) =>
+            getDocSlug(doc) !== entrySlug &&
+            (entry.data.category ? doc.data.category === entry.data.category : false),
+    )
+    .sort((a, b) => {
+        const updatedA = a.data.lastUpdated?.getTime() ?? 0;
+        const updatedB = b.data.lastUpdated?.getTime() ?? 0;
+        return updatedB - updatedA;
+    });
+
+const relatedFallback = allDocs
+    .filter(
+        (doc) =>
+            getDocSlug(doc) !== entrySlug &&
+            !relatedSameCategory.some((sameDoc) => getDocSlug(sameDoc) === getDocSlug(doc)),
+    )
+    .sort((a, b) => {
+        const updatedA = a.data.lastUpdated?.getTime() ?? 0;
+        const updatedB = b.data.lastUpdated?.getTime() ?? 0;
+        return updatedB - updatedA;
+    });
+
+const relatedArticles = [...relatedSameCategory, ...relatedFallback]
+    .slice(0, 5)
+    .map((doc) => ({
+        title: doc.data.title,
+        description:
+            doc.data.description || `Learn more about ${doc.data.title} in this guide.`,
+        href: getDocUrl(doc),
+    }));
+---
+
+<DocsLayout
+    title={entry.data.title}
+    description={entry.data.description}
+    category={entry.data.category}
+    currentSlug={entrySlug}
+    headings={headings}
+    articleData={{
+        publishedTime: entry.data.publishedDate?.toISOString(),
+        modifiedTime: entry.data.lastUpdated?.toISOString(),
+        author: entry.data.author,
+        tags: entry.data.tags,
+        readTimeMinutes,
+    }}
+    navigationData={{
+        previous: previousDoc
+            ? { title: previousDoc.data.title, href: getDocUrl(previousDoc) }
+            : undefined,
+        next: nextDoc
+            ? { title: nextDoc.data.title, href: getDocUrl(nextDoc) }
+            : undefined,
+    }}
+    relatedArticles={relatedArticles}
+>
+    <Content />
+</DocsLayout>

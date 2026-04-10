@@ -1,0 +1,298 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "../../../layouts/Layout.astro";
+import Search from "../../../components/Search.astro";
+import { getDocUrl } from "../../../lib/docs";
+
+export async function getStaticPaths() {
+    const allDocs = await getCollection("docs");
+    const categoryOrder = [
+        "Basic",
+        "Email Piping",
+        "Integration",
+        "Knowledge Base",
+        "FAQs",
+    ];
+    const categories = [
+        ...new Set(allDocs.map((doc) => doc.data.category || "Uncategorized")),
+    ].sort((a, b) => {
+        const ai = categoryOrder.indexOf(a);
+        const bi = categoryOrder.indexOf(b);
+        const an = ai === -1 ? Number.MAX_SAFE_INTEGER : ai;
+        const bn = bi === -1 ? Number.MAX_SAFE_INTEGER : bi;
+        if (an === bn) return a.localeCompare(b);
+        return an - bn;
+    });
+    const categoryCounts = categories.reduce(
+        (acc, cat) => {
+            acc[cat] = allDocs.filter(
+                (doc) => (doc.data.category || "Uncategorized") === cat,
+            ).length;
+            return acc;
+        },
+        {} as Record<string, number>,
+    );
+
+    return categories.map((category) => {
+        const slug = category.toLowerCase().replace(/\s+/g, "-");
+        const categoryDocs = allDocs.filter(
+            (doc) => (doc.data.category || "Uncategorized") === category,
+        );
+        return {
+            params: { category: slug },
+            props: {
+                category,
+                docs: categoryDocs,
+                allDocs,
+                allCategories: categories,
+                categoryCounts,
+            },
+        };
+    });
+}
+
+const { category, docs, allDocs, allCategories, categoryCounts } = Astro.props;
+
+const categoryDescriptions: Record<string, string> = {
+    "Getting Started": "Installation, setup, and first steps to get your documentation site up and running.",
+    "Guides": "Step-by-step walkthroughs for writing content, adding images, and customizing the theme.",
+    "Features": "Details on built-in features including search, SEO, categories, and navigation.",
+    "Reference": "Technical reference for frontmatter schema, project structure, and deployment.",
+};
+
+const firstCategory = allCategories[0];
+const docsToDisplay = category === firstCategory ? allDocs : docs;
+
+// Sort docs by date or title
+const sortedDocs = docsToDisplay.sort((a, b) =>
+    b.data.title.localeCompare(a.data.title),
+);
+
+// Get other categories for the sidebar
+const categoriesWithCounts = allCategories.map((cat) => {
+    return {
+        name: cat,
+        slug: cat.toLowerCase().replace(/\s+/g, "-"),
+        count: categoryCounts?.[cat] || 0,
+    };
+});
+
+function getTimeAgo(date?: Date): string {
+    if (!date) return "Recently updated";
+    const now = new Date();
+    const diff = now.getTime() - date.getTime();
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    if (hours < 24) return `${hours} hours ago`;
+    const days = Math.floor(hours / 24);
+    if (days < 7) return `${days} days ago`;
+    const weeks = Math.floor(days / 7);
+    if (weeks < 5) return `${weeks} weeks ago`;
+    const months = Math.floor(days / 30);
+    return `${months} months ago`;
+}
+---
+
+<Layout title={`${category} - SupportGenix Docs`}>
+    <header class="bg-[linear-gradient(90deg,var(--sgkb-primary)_0%,var(--sgkb-primary-light)_100%)] py-14 lg:py-16 relative overflow-visible">
+        <div class="absolute inset-0 bg-[radial-gradient(circle_at_15%_0%,var(--sgkb-overlay-soft),transparent_55%)]"></div>
+        <div class="container-wide relative z-10">
+            <nav aria-label="Breadcrumb" class="mb-6">
+                <ol class="flex flex-wrap items-center gap-x-4 gap-y-2 text-[14px] font-medium text-white/80">
+                    <li class="inline-flex items-center gap-x-4">
+                        <a href="/" class="transition-colors hover:text-white">Home</a>
+                    </li>
+                    <li class="inline-flex items-center gap-x-4">
+                        <span class="text-white/45">/</span>
+                        <a href="/docs" class="transition-colors hover:text-white">Documentation</a>
+                    </li>
+                    <li class="inline-flex items-center gap-x-4">
+                        <span class="text-white/45">/</span>
+                        <span class="text-white font-semibold">{category}</span>
+                    </li>
+                </ol>
+            </nav>
+
+            <h1 class="text-[48px] font-bold text-white mb-5 leading-[1.15] tracking-[-0.02em]">
+                {category}
+            </h1>
+            <p
+                class="text-white/85 text-[16px] md:text-[18px] max-w-6xl mb-5 leading-[1.45]"
+            >
+                {categoryDescriptions[category] ||
+                    `Explore our comprehensive guides and tutorials for ${category}. Learn how to optimize your workflow and get the most out of SupportGenix.`}
+            </p>
+            <div
+                class="text-white/75 text-[14px] font-medium mb-9"
+            >
+                {docsToDisplay.length} articles
+            </div>
+
+            <div class="max-w-[480px] [&>div]:mx-0">
+                <Search />
+            </div>
+        </div>
+    </header>
+
+    <div class="py-24 bg-brand-gray-50">
+        <div class="container-wide">
+            <div class="flex flex-col lg:flex-row gap-12">
+                <!-- Sidebar: Related Categories -->
+                <aside class="lg:w-80 flex-shrink-0">
+                    <div
+                        class="bg-white rounded-[18px] p-7 border border-brand-gray-200 shadow-[var(--sgkb-shadow-xs-soft)] sticky top-24"
+                    >
+                        <h4
+                            class="text-[20px] font-semibold text-brand-gray-900 mb-5"
+                        >
+                            Related Categories
+                        </h4>
+                        <nav class="space-y-1.5">
+                            {
+                                categoriesWithCounts
+                                    .map((cat) => (
+                                    <a
+                                        href={`/docs/category/${cat.slug}`}
+                                        class:list={[
+                                            "group flex items-center justify-between gap-3 px-3 py-2.5 rounded-xl transition-all",
+                                            cat.name === category
+                                                ? "text-primary bg-[var(--sgkb-surface-subtle)]"
+                                                : "text-brand-gray-600 hover:text-primary hover:bg-[var(--sgkb-surface-subtle)]",
+                                        ]}
+                                    >
+                                        <span class="inline-flex items-center gap-3 min-w-0">
+                                            <span class="w-[6px] h-[6px] rounded-full bg-primary flex-shrink-0"></span>
+                                            <span class="text-[16px] leading-[1.4] font-medium truncate">
+                                                {cat.name}
+                                            </span>
+                                        </span>
+                                        <span class="inline-flex items-center justify-center min-w-[28px] h-[28px] px-2 rounded-[10px] bg-brand-gray-100 text-brand-gray-400 text-[12px] font-semibold">
+                                            {cat.count}
+                                        </span>
+                                    </a>
+                                ))
+                            }
+                        </nav>
+                    </div>
+                </aside>
+
+                <!-- Article List -->
+                <main
+                    class="flex-grow min-w-0"
+                    x-data={`{
+                        currentPage: 1,
+                        perPage: 10,
+                        totalItems: ${sortedDocs.length},
+                        get totalPages() {
+                            return Math.max(1, Math.ceil(this.totalItems / this.perPage));
+                        },
+                        get startIndex() {
+                            return (this.currentPage - 1) * this.perPage + 1;
+                        },
+                        get endIndex() {
+                            return Math.min(this.currentPage * this.perPage, this.totalItems);
+                        },
+                        goToPage(page) {
+                            this.currentPage = Math.min(Math.max(page, 1), this.totalPages);
+                        },
+                        isVisible(index) {
+                            const start = (this.currentPage - 1) * this.perPage;
+                            const end = this.currentPage * this.perPage;
+                            return index >= start && index < end;
+                        }
+                    }`}
+                >
+                    <div
+                        class="flex items-center justify-between mb-7 border-b border-brand-gray-200 pb-5"
+                    >
+                        <h3
+                            class="text-4xl font-bold text-brand-gray-900 tracking-tight"
+                        >
+                            Articles
+                        </h3>
+                        <span
+                            class="text-[14px] font-normal text-brand-gray-400"
+                            x-text="`Showing ${startIndex}-${endIndex} of ${totalItems} articles`"
+                        ></span>
+                    </div>
+
+                    <div class="space-y-5">
+                        {
+                            sortedDocs.map((doc, index) => (
+                                <article
+                                    x-show={`isVisible(${index})`}
+                                    class="bg-white rounded-[18px] px-6 py-7 border border-[var(--sgkb-border-soft-muted)] hover:border-[var(--sgkb-primary-light)] hover:shadow-[var(--sgkb-shadow-md)] hover:-translate-y-[2px] transition-all"
+                                >
+                                    <div class="mb-3">
+                                        <h4 class="text-[20px] leading-[1.35] font-semibold text-brand-gray-900 mb-2">
+                                            <a
+                                                href={getDocUrl(doc)}
+                                                class="transition-colors hover:text-primary"
+                                            >
+                                                {doc.data.title}
+                                            </a>
+                                        </h4>
+                                        <span class="text-[14px] font-normal text-brand-gray-400">
+                                            {getTimeAgo(doc.data.lastUpdated)}
+                                        </span>
+                                    </div>
+                                    <p class="text-brand-gray-500 text-[15px] leading-[1.65] mb-5 line-clamp-2">
+                                        {doc.data.description ||
+                                            "Learn more about this topic in our detailed documentation. We provide step-by-step guides and examples to help you succeed."}
+                                    </p>
+                                    <a
+                                        href={getDocUrl(doc)}
+                                        class="group inline-flex items-center gap-2 text-[14px] font-semibold text-primary"
+                                    >
+                                        Read article
+                                        <span class="transition-transform group-hover:translate-x-[2px]">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                                <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                            </svg>
+                                        </span>
+                                    </a>
+                                </article>
+                            ))
+                        }
+                    </div>
+
+                    <!-- Simple Pagination -->
+                    <div
+                        class="mt-16 flex items-center justify-center gap-2"
+                        x-show="totalPages > 1"
+                    >
+                        <button
+                            type="button"
+                            @click="goToPage(currentPage - 1)"
+                            :disabled="currentPage === 1"
+                            class="w-11 h-11 rounded-xl bg-white border border-brand-gray-200 flex items-center justify-center text-brand-gray-400 hover:border-primary hover:text-primary transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                            aria-label="Previous page"
+                        >
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M19 12H5M5 12L12 19M5 12L12 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                        </button>
+
+                        <template x-for="page in totalPages" :key="page">
+                            <button
+                                type="button"
+                                @click="goToPage(page)"
+                                :class="currentPage === page ? 'bg-primary border-primary text-white' : 'bg-white border-brand-gray-200 text-brand-gray-500 hover:border-primary hover:text-primary'"
+                                class="w-11 h-11 rounded-xl border flex items-center justify-center text-sm font-semibold transition-all cursor-pointer"
+                                x-text="page"
+                            ></button>
+                        </template>
+
+                        <button
+                            type="button"
+                            @click="goToPage(currentPage + 1)"
+                            :disabled="currentPage === totalPages"
+                            class="w-11 h-11 rounded-xl bg-white border border-brand-gray-200 flex items-center justify-center text-brand-gray-400 hover:border-primary hover:text-primary transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                            aria-label="Next page"
+                        >
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                        </button>
+                    </div>
+                </main>
+            </div>
+        </div>
+    </div>
+</Layout>
+

@@ -1,0 +1,84 @@
+---
+title: "Customizing the Theme"
+description: "How to change colors, fonts, and design tokens to match your brand."
+category: "Guides"
+order: 3
+publishedDate: 2026-01-02
+lastUpdated: 2026-01-02
+tags: ["theme", "styling", "tailwind", "customization"]
+author: "Documentation Team"
+tableOfContents: true
+---
+
+## Color System
+
+The theme uses Tailwind CSS 4 with custom design tokens defined in `src/assets/styles/global.css`. The primary color and full palette are configured using CSS custom properties under the `@theme` directive.
+
+### Changing the Primary Color
+
+Find the `@theme` block in `global.css` and update the primary color values:
+
+```css
+@theme {
+    --color-primary: #08ac53;
+    --color-primary-dark: #079148;
+    --color-primary-light: #34d27a;
+}
+```
+
+Replace these hex values with your brand color. All buttons, links, active states, and accent elements will update automatically.
+
+### Design Tokens
+
+The theme uses `--sgkb-*` CSS custom properties for fine-grained control over specific UI elements:
+
+- `--sgkb-primary` — Main accent color
+- `--sgkb-text-primary` — Primary text color
+- `--sgkb-text-secondary` — Secondary/muted text color
+- `--sgkb-footer-bg` — Footer background
+- `--sgkb-header-nav` — Header navigation text color
+
+These tokens are defined in `global.css` and can be adjusted to fine-tune individual components without changing the overall color palette.
+
+## Fonts
+
+The theme uses self-hosted **Poppins** via `@fontsource/poppins`. To change the font:
+
+1. Install your preferred font from Fontsource:
+
+```bash
+npm install @fontsource/inter
+```
+
+2. Update the import in `src/layouts/Layout.astro`:
+
+```js
+import "@fontsource/inter/400.css";
+import "@fontsource/inter/500.css";
+import "@fontsource/inter/600.css";
+import "@fontsource/inter/700.css";
+```
+
+3. Update the font-family in `global.css`.
+
+## Logo
+
+Replace the logo by editing `src/components/Logo.astro`. You can use an SVG inline, an image file, or plain text.
+
+## Header and Footer
+
+The header navigation items and footer links are driven by `src/lib/site-config.ts`. To change what appears in the navigation, update the link values in the config file. To change the structure of the header or footer, edit `src/components/Header.astro` and `src/components/Footer.astro` directly.
+
+## Prose Styling
+
+Documentation article content uses a custom `.prose-sg` variant for typography. This controls how headings, paragraphs, links, code blocks, tables, and blockquotes appear inside articles. You can adjust these styles in `global.css`.
+
+## Admonitions
+
+The theme includes styled admonition boxes for callouts:
+
+- `.sgkb-admonition-info` — Blue, for general information
+- `.sgkb-admonition-warning` — Yellow, for cautions
+- `.sgkb-admonition-success` — Green, for positive notes
+- `.sgkb-admonition-error` — Red, for errors or critical warnings
+- `.sgkb-admonition-tip` — Purple, for helpful tips

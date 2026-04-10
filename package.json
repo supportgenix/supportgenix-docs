@@ -1,0 +1,56 @@
+{
+  "name": "supportgenix-docs",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "index.js",
+  "homepage": "https://github.com/supportgenix/supportgenix-docs",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/supportgenix/supportgenix-docs.git"
+  },
+  "bugs": {
+    "url": "https://github.com/supportgenix/supportgenix-docs/issues"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "postbuild": "pagefind --site dist",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "keywords": [
+    "astro",
+    "astro-component",
+    "withastro",
+    "astro-theme",
+    "documentation",
+    "knowledge-base",
+    "supportgenix",
+    "tailwindcss",
+    "mdx",
+    "pagefind"
+  ],
+  "author": "SupportGenix",
+  "license": "ISC",
+  "description": "SupportGenix Docs is a modern Astro documentation and knowledge base theme with MDX content collections, Tailwind styling, and Pagefind search.",
+  "dependencies": {
+    "@astrojs/alpinejs": "^0.5.0",
+    "@astrojs/mdx": "^5.0.3",
+    "@astrojs/sitemap": "^3.7.2",
+    "@fontsource/poppins": "^5.2.7",
+    "@tailwindcss/forms": "^0.5.11",
+    "@tailwindcss/postcss": "^4.1.18",
+    "@tailwindcss/typography": "^0.5.19",
+    "@tailwindcss/vite": "^4.1.18",
+    "@types/alpinejs": "^3.13.11",
+    "alpinejs": "^3.15.8",
+    "astro": "^6.1.3",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^4.1.18"
+  },
+  "devDependencies": {
+    "pagefind": "^1.4.0",
+    "turndown": "^7.2.2"
+  }
+}

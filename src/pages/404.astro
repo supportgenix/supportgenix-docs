@@ -1,0 +1,102 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Logo from "../components/Logo.astro";
+---
+
+<Layout title="404 - Page Not Found">
+    <div class="min-h-[70vh] flex items-center justify-center py-20 px-6">
+        <div class="max-w-2xl w-full text-center">
+            <!-- Glassmorphism Container -->
+            <div
+                class="bg-white/40 backdrop-blur-xl border border-white/20 p-12 md:p-20 rounded-[3rem] shadow-2xl relative overflow-hidden group"
+            >
+                <!-- Decor -->
+                <div
+                    class="absolute top-0 right-0 -mr-20 -mt-20 w-64 h-64 bg-primary/5 rounded-full blur-3xl"
+                >
+                </div>
+                <div
+                    class="absolute bottom-0 left-0 -ml-20 -mb-20 w-64 h-64 bg-primary-dark/5 rounded-full blur-3xl"
+                >
+                </div>
+
+                <div class="relative z-10 flex flex-col items-center">
+                    <div class="mb-10 scale-125">
+                        <Logo />
+                    </div>
+
+                    <h1
+                        class="text-8xl md:text-9xl font-black text-primary mb-6 tracking-tighter animate-bounce"
+                    >
+                        404
+                    </h1>
+
+                    <h2
+                        class="text-3xl md:text-4xl font-bold text-brand-gray-900 mb-6 tracking-tight"
+                    >
+                        Oops! Content Lost in Space
+                    </h2>
+
+                    <p
+                        class="text-brand-gray-500 text-lg mb-12 max-w-md leading-relaxed font-medium"
+                    >
+                        The documentation page you are looking for might have
+                        been moved, removed, or never existed in the first
+                        place.
+                    </p>
+
+                    <div class="flex flex-wrap justify-center gap-4">
+                        <a
+                            href="/"
+                            class="px-8 py-4 bg-primary text-white font-bold rounded-2xl hover:bg-primary-dark transition-all shadow-lg active:scale-95 flex items-center gap-3"
+                        >
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="20"
+                                height="20"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2.5"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                ><path
+                                    d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"
+                                ></path><polyline points="9 22 9 12 15 12 15 22"
+                                ></polyline></svg
+                            >
+                            Back to Home
+                        </a>
+                        <a
+                            href="/docs"
+                            class="px-8 py-4 bg-brand-gray-900 text-white font-bold rounded-2xl hover:bg-brand-gray-800 transition-all shadow-lg active:scale-95 flex items-center gap-3"
+                        >
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="20"
+                                height="20"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2.5"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                ><path
+                                    d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"
+                                ></path><polyline points="14 2 14 8 20 8"
+                                ></polyline></svg
+                            >
+                            Browse Docs
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <p
+                class="mt-12 text-sm text-brand-gray-400 font-bold uppercase tracking-widest"
+            >
+                Search might help you find what you need
+            </p>
+        </div>
+    </div>
+</Layout>

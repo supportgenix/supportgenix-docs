@@ -1,0 +1,5 @@
+# Replace the Sitemap URL below with your absolute production domain.
+# Most search engines require an absolute URL here (not a relative path).
+User-agent: *
+Allow: /
+Sitemap: https://yourdomain.com/sitemap-index.xml

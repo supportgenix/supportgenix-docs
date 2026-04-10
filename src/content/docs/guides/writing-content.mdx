@@ -1,0 +1,102 @@
+---
+title: "Writing Content"
+description: "How to create documentation articles using MDX files and frontmatter."
+category: "Guides"
+order: 1
+publishedDate: 2026-01-02
+lastUpdated: 2026-01-02
+tags: ["content", "mdx", "authoring"]
+author: "Documentation Team"
+tableOfContents: true
+---
+
+## Creating an Article
+
+All documentation articles are MDX files stored in `src/content/docs/`. To create a new article, add a `.mdx` file inside a category folder:
+
+```text
+src/content/docs/<category>/<article-slug>.mdx
+```
+
+For example, to add an article called "API Reference" under a "Reference" category:
+
+```text
+src/content/docs/reference/api-reference.mdx
+```
+
+The file path determines the URL. This file would be accessible at `/docs/reference/api-reference`.
+
+## Frontmatter
+
+Every article starts with a YAML frontmatter block. Here is a complete example:
+
+```mdx
+---
+title: "Your Article Title"
+description: "A brief summary of what this article covers"
+category: "Guides"
+order: 1
+publishedDate: 2026-01-01
+lastUpdated: 2026-01-15
+tags: ["example", "guide"]
+author: "Documentation Team"
+tableOfContents: true
+---
+
+Your content starts here.
+```
+
+### Required Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `title` | string | The article title shown in the page header and sidebar |
+| `description` | string | A short summary used in cards and SEO metadata |
+| `category` | string | The category this article belongs to |
+
+### Optional Fields
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `order` | number | — | Controls sort order within a category (lower numbers appear first) |
+| `publishedDate` | date | — | Original publish date |
+| `lastUpdated` | date | — | Last modified date |
+| `tags` | string[] | — | Tags for organization and related articles |
+| `author` | string | Config default | Author name displayed on the article |
+| `tableOfContents` | boolean | — | Whether to show the table of contents sidebar |
+| `featuredImage` | string | — | Path to a featured image |
+
+## Writing with MDX
+
+MDX lets you use standard Markdown along with Astro and JSX components. You can write headings, lists, code blocks, tables, and blockquotes just like regular Markdown.
+
+### Headings
+
+Use `##` for top-level sections and `###` for subsections. These headings automatically appear in the table of contents.
+
+### Code Blocks
+
+Wrap code in triple backticks with an optional language identifier:
+
+````mdx
+```js
+const greeting = "Hello, world!";
+console.log(greeting);
+```
+````
+
+### Links
+
+Link to other articles using standard Markdown links with absolute paths:
+
+```mdx
+Check out the [Installation](/docs/getting-started/installation) guide.
+```
+
+## Creating Categories
+
+Categories are created automatically based on the `category` field in your frontmatter. All articles with the same category value are grouped together in the sidebar and on category pages. You do not need to register categories anywhere — just use a consistent name across your articles.
+
+## Ordering Articles
+
+Use the `order` field to control the display order within a category. Articles with lower numbers appear first. Articles without an `order` field are sorted alphabetically by title.

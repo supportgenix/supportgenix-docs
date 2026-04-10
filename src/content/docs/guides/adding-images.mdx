@@ -1,0 +1,52 @@
+---
+title: "Adding Images"
+description: "How to add and optimize images in your documentation articles."
+category: "Guides"
+order: 2
+publishedDate: 2026-01-02
+lastUpdated: 2026-01-02
+tags: ["images", "media", "components"]
+author: "Documentation Team"
+tableOfContents: true
+---
+
+## Image Location
+
+Store all documentation images in the `src/assets/images/docs/` directory. Astro will automatically optimize these images during the build process.
+
+## Using the DocImage Component
+
+Import and use the `DocImage` component in your MDX files for optimized image rendering:
+
+```mdx
+import DocImage from '../../components/DocImage.astro'
+
+<DocImage src="../../assets/images/docs/my-screenshot.png" alt="Description of the image" />
+```
+
+The `DocImage` component handles responsive sizing and format conversion automatically through Astro's built-in image optimization.
+
+## Alt Text
+
+Always provide descriptive `alt` text for accessibility. The alt text should describe what the image shows so that screen readers can convey the information to users who cannot see the image.
+
+**Good:** `alt="Settings page showing the theme color picker"`
+
+**Avoid:** `alt="screenshot"` or `alt="image"`
+
+## Supported Formats
+
+You can use the following image formats:
+
+- **PNG** — Best for screenshots and images with text
+- **JPG** — Best for photographs
+- **WebP** — Smaller file sizes with good quality
+- **SVG** — Best for icons and diagrams
+
+Astro automatically converts images to optimized formats during the build.
+
+## Tips
+
+- Use descriptive file names like `dashboard-settings.png` instead of `img1.png`.
+- Keep images at a reasonable resolution. Screenshots at 2x display resolution are a good balance of clarity and file size.
+- Organize images into subfolders within `src/assets/images/docs/` if you have many images.

@@ -1,0 +1,84 @@
+---
+title: "Deployment"
+description: "How to build and deploy the documentation site to various hosting platforms."
+category: "Reference"
+order: 3
+publishedDate: 2026-01-04
+lastUpdated: 2026-01-04
+tags: ["deployment", "hosting", "build"]
+author: "Documentation Team"
+tableOfContents: true
+---
+
+## Building for Production
+
+Run the build command to generate the static site:
+
+```bash
+npm run build
+```
+
+This does two things:
+
+1. Astro compiles all pages into static HTML/CSS/JS in the `dist/` directory.
+2. The `postbuild` script runs Pagefind to generate the search index in `dist/pagefind/`.
+
+## Pre-Deployment Checklist
+
+Before deploying, verify these settings:
+
+- [ ] `site` in `astro.config.mjs` is set to your production domain
+- [ ] `siteUrl` in `src/lib/site-config.ts` matches your domain
+- [ ] `homepage` in `package.json` is updated
+- [ ] `public/robots.txt` has the correct sitemap URL
+- [ ] All placeholder links in `site-config.ts` are replaced with real URLs
+
+## Hosting Platforms
+
+The `dist/` folder can be deployed to any static hosting provider. Here are common options:
+
+### Cloudflare Pages
+
+Connect your Git repository to Cloudflare Pages. Set the build command to `npm run build` and the output directory to `dist`.
+
+### Netlify
+
+Connect your repository and configure:
+
+- **Build command:** `npm run build`
+- **Publish directory:** `dist`
+
+### Vercel
+
+Import your repository and set the framework preset to "Astro" or configure manually:
+
+- **Build command:** `npm run build`
+- **Output directory:** `dist`
+
+### GitHub Pages
+
+Use a GitHub Actions workflow to build and deploy. Set the output directory to `dist` in your workflow configuration.
+
+### Manual / S3 + CDN
+
+Run `npm run build` locally and upload the contents of `dist/` to your hosting provider or S3 bucket. Configure your CDN to serve from the bucket.
+
+## Previewing Before Deploy
+
+To test the production build locally before deploying:
+
+```bash
+npm run preview
+```
+
+This serves the `dist/` directory on a local server so you can verify everything works as expected, including Pagefind search.
+
+## Troubleshooting
+
+### Search Not Working After Deploy
+
+Make sure the `postbuild` script ran successfully. The `dist/pagefind/` directory should exist and contain index files. Some hosting platforms may not run `postbuild` automatically — in that case, use `npm run build && npx pagefind --site dist` as your build command.
+
+### Wrong URLs in Sitemap or Meta Tags
+
+Double-check that the `site` value in `astro.config.mjs` matches your actual production URL, including the protocol (`https://`).

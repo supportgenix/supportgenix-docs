@@ -1,0 +1,55 @@
+---
+title: "Categories and Navigation"
+description: "How categories, sidebar navigation, and article relationships work."
+category: "Features"
+order: 3
+publishedDate: 2026-01-03
+lastUpdated: 2026-01-03
+tags: ["categories", "navigation", "sidebar"]
+author: "Documentation Team"
+tableOfContents: true
+---
+
+## How Categories Work
+
+Categories are created automatically from the `category` field in your article frontmatter. There is no separate configuration file for categories — simply use the same category name across multiple articles and they will be grouped together.
+
+```mdx
+---
+category: "Getting Started"
+---
+```
+
+All articles with `category: "Getting Started"` will appear together in the sidebar and on the Getting Started category page.
+
+## Sidebar Navigation
+
+The left sidebar on documentation pages shows all categories with their articles listed underneath. Categories are sorted alphabetically, and articles within each category are sorted by the `order` field (ascending), then by title.
+
+Each category section in the sidebar is collapsible. The current article's category is expanded by default.
+
+## Category Pages
+
+Each category has its own listing page at `/docs/category/<category-slug>`. These pages show all articles in that category with pagination (10 articles per page).
+
+The category slug is generated from the category name by converting to lowercase and replacing spaces with hyphens. For example, "Getting Started" becomes `getting-started`.
+
+## Related Articles
+
+At the bottom of each article, a "Related Articles" section displays up to 5 articles. The selection logic:
+
+1. First, articles from the same category (excluding the current article)
+2. If fewer than 5, articles from other categories are added
+3. Results are sorted by date (most recent first)
+
+## Previous and Next Navigation
+
+At the bottom of each article, previous and next links allow readers to move sequentially through articles in the same category. The order follows the same sorting used in the sidebar.
+
+## Breadcrumbs
+
+Every article page shows breadcrumbs at the top: **Home > Docs > Category > Article Title**. These help users orient themselves and navigate back to parent pages.
+
+## Adding a New Category
+
+To create a new category, simply create a new folder in `src/content/docs/` and add MDX files with the matching `category` value in their frontmatter. The sidebar, category pages, and navigation will update automatically.

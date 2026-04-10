@@ -1,0 +1,60 @@
+---
+title: "SEO"
+description: "Built-in SEO features including meta tags, Open Graph, JSON-LD, and sitemap generation."
+category: "Features"
+order: 2
+publishedDate: 2026-01-03
+lastUpdated: 2026-01-03
+tags: ["seo", "metadata", "opengraph"]
+author: "Documentation Team"
+tableOfContents: true
+---
+
+## Overview
+
+The theme generates comprehensive SEO metadata for every page automatically. All SEO logic is centralized in `src/components/SEO.astro`.
+
+## What's Included
+
+### Meta Tags
+
+Every page includes:
+
+- `<title>` tag with the page title and site name
+- `<meta name="description">` from the article's frontmatter
+- Canonical URL to prevent duplicate content issues
+- Theme color meta tag
+
+### Open Graph
+
+Open Graph tags are generated for rich previews on Facebook, LinkedIn, and other platforms:
+
+- `og:title`, `og:description`, `og:url`
+- `og:image` with the default OG image or a custom one
+- `og:type` set to `article` for documentation pages
+- `og:site_name` from your site configuration
+
+### Twitter Cards
+
+Twitter card meta tags ensure your links display well when shared:
+
+- `twitter:card` set to `summary_large_image`
+- `twitter:title`, `twitter:description`, `twitter:image`
+
+### JSON-LD Structured Data
+
+The theme generates three types of JSON-LD structured data:
+
+- **Organization** — Your company information
+- **BreadcrumbList** — Navigation breadcrumbs for search engines
+- **Article** — Article metadata including author, dates, and description
+
+## Sitemap
+
+Sitemap generation is handled automatically by `@astrojs/sitemap`. It reads the `site` value from `astro.config.mjs` and generates a sitemap at `/sitemap-index.xml`.
+
+Make sure `public/robots.txt` points to the correct sitemap URL for your domain.
+
+## Customizing SEO
+
+To change the default description, OG image, or other defaults, edit the props and fallback values in `src/components/SEO.astro`. Article-level SEO data is pulled from frontmatter, so keep your `title` and `description` fields descriptive and accurate.

@@ -1,0 +1,60 @@
+---
+title: "Search"
+description: "How the built-in search system works, including Pagefind and the JSON fallback."
+category: "Features"
+order: 1
+publishedDate: 2026-01-03
+lastUpdated: 2026-01-03
+tags: ["search", "pagefind"]
+author: "Documentation Team"
+tableOfContents: true
+---
+
+## Overview
+
+The theme includes a built-in search system that works in two modes, with automatic fallback to ensure search is always available.
+
+## Pagefind (Production)
+
+In production builds, search is powered by [Pagefind](https://pagefind.app/) — a static search library that indexes your content at build time. It provides fast, full-text search with no server required.
+
+Pagefind is generated automatically when you run:
+
+```bash
+npm run build
+```
+
+The `postbuild` script runs `pagefind --site dist` which scans all pages with the `data-pagefind-body` attribute and creates a search index in `dist/pagefind/`.
+
+### How It Works
+
+1. During the build, Pagefind scans article content marked with `data-pagefind-body` in the docs layout.
+2. It generates a static index stored alongside your site files.
+3. On the client, the search component dynamically loads the Pagefind library and queries the index.
+4. Results appear instantly in a dropdown as you type.
+
+## JSON Fallback (Development)
+
+During local development, the Pagefind index is not available. The theme automatically falls back to a JSON-based search endpoint at `/search-index.json`.
+
+This fallback uses a scoring algorithm that ranks results by:
+
+- Exact title matches (highest priority)
+- Partial title matches
+- Category matches
+- Description/excerpt matches
+
+The fallback search is functional but less comprehensive than Pagefind. For the best search experience, test with a production build.
+
+## Search Component
+
+The search bar appears in the header and on the homepage hero section. It features:
+
+- Debounced input (250ms delay to avoid excessive queries)
+- Popular searches shown when the input is empty
+- Up to 8 results displayed in the dropdown
+- Keyboard-friendly navigation
+
+## Customizing Search
+
+To change the search behavior, edit `src/components/Search.astro`. The component uses Alpine.js for state management and handles both Pagefind and fallback modes automatically.

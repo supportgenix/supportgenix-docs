@@ -1,0 +1,76 @@
+---
+title: "Project Structure"
+description: "Overview of the project directory structure and what each part does."
+category: "Reference"
+order: 2
+publishedDate: 2026-01-04
+lastUpdated: 2026-01-04
+tags: ["structure", "architecture", "reference"]
+author: "Documentation Team"
+tableOfContents: true
+---
+
+## Directory Overview
+
+```text
+src/
+  content.config.ts          # Content collection schema (Zod validation)
+  assets/
+    images/docs/             # Documentation images (optimized at build)
+    styles/global.css        # Design tokens, Tailwind theme, prose styles
+  components/
+    Header.astro             # Site header with navigation
+    Footer.astro             # Site footer with links and newsletter
+    Logo.astro               # Site logo component
+    Search.astro             # Search bar with Pagefind + fallback
+    SearchHero.astro         # Homepage search hero section
+    Sidebar.astro            # Docs sidebar navigation
+    Breadcrumbs.astro        # Breadcrumb navigation
+    SEO.astro                # Meta tags, Open Graph, JSON-LD
+    TableOfContents.astro    # Article table of contents
+    DocImage.astro           # Optimized image component for docs
+    CategoryCard.astro       # Category preview card
+    FeaturedCard.astro       # Featured article card
+  content/
+    docs/**/*.mdx            # Documentation articles
+  layouts/
+    Layout.astro             # Base layout (wraps all pages)
+    DocsLayout.astro         # Documentation article layout
+  lib/
+    site-config.ts           # Brand, links, and social configuration
+    docs.ts                  # Content query and sorting utilities
+    theme.ts                 # Theme color constant
+  pages/
+    index.astro              # Homepage
+    404.astro                # Error page
+    docs/index.astro         # Documentation listing page
+    docs/[...slug].astro     # Individual article pages
+    docs/category/[category].astro  # Category listing pages
+    search-index.json.ts     # Fallback search JSON endpoint
+public/
+  robots.txt                 # Search engine directives
+  og-image.png               # Default Open Graph image
+  favicon-*.png              # Favicon files
+```
+
+## Key Files
+
+### `src/lib/site-config.ts`
+
+Single source of truth for brand name, organization, author defaults, and all navigation links. Changing values here updates the header, footer, and SEO metadata across the entire site.
+
+### `src/lib/docs.ts`
+
+Utility functions for querying content collections. Provides `getAllDocs()`, `getDocsByCategory()`, `getCategories()`, and `getDocsNav()` which are used by page routes and layout components.
+
+### `src/content.config.ts`
+
+Defines the Zod schema for the `docs` content collection. Uses a `glob()` loader to find all MDX files in `src/content/docs/`.
+
+### `src/layouts/DocsLayout.astro`
+
+The three-column documentation layout with sidebar navigation, article content area, and table of contents. Handles article metadata display, feedback UI, related articles, and previous/next navigation.
+
+### `src/assets/styles/global.css`
+
+Contains the Tailwind CSS 4 `@theme` configuration with color palette, custom properties (`--sgkb-*`), prose typography styles, and admonition box styles.

@@ -1,0 +1,79 @@
+---
+title: "Configuration"
+description: "How to configure the site for your brand, links, and deployment domain."
+category: "Getting Started"
+order: 3
+publishedDate: 2026-01-01
+lastUpdated: 2026-01-01
+tags: ["config", "branding", "setup"]
+author: "Documentation Team"
+tableOfContents: true
+---
+
+## Site Configuration
+
+All site-wide settings are managed from a single file: `src/lib/site-config.ts`. This is where you set your brand name, organization, and all navigation links.
+
+```ts
+export const SITE_CONFIG = {
+    brandName: "Your Docs",
+    organizationName: "Your Company",
+    defaultAuthor: "Documentation Team",
+    siteUrl: "https://yourdomain.com",
+    links: {
+        home: "/",
+        docsHome: "/docs",
+        blog: "https://yourdomain.com/blog",
+        contact: "https://yourdomain.com/contact",
+        about: "https://yourdomain.com/about",
+        terms: "https://yourdomain.com/terms",
+        privacy: "https://yourdomain.com/privacy",
+        twitter: "https://twitter.com/yourhandle",
+        github: "https://github.com/your-org",
+    },
+};
+```
+
+Update the values to match your business. The header, footer, and SEO components all read from this file, so you only need to change things in one place.
+
+## Astro Config
+
+Open `astro.config.mjs` and set the `site` property to your production domain:
+
+```js
+export default defineConfig({
+    site: "https://yourdomain.com",
+    // ...
+});
+```
+
+This is used for generating canonical URLs, the sitemap, and Open Graph metadata.
+
+## Package Metadata
+
+In `package.json`, update these fields:
+
+```json
+{
+    "homepage": "https://yourdomain.com",
+    "repository": {
+        "url": "https://github.com/your-org/your-repo"
+    }
+}
+```
+
+## Robots and Sitemap
+
+Check `public/robots.txt` and confirm the sitemap URL matches your domain:
+
+```text
+Sitemap: https://yourdomain.com/sitemap-index.xml
+```
+
+## Theme Color
+
+The primary theme color is defined in `src/lib/theme.ts` and used by the SEO component for the browser theme color meta tag. The full color palette is configured in `src/assets/styles/global.css` using Tailwind CSS 4 design tokens.
+
+## What's Next?
+
+Now that the site is configured, learn how to [write content](/docs/guides/writing-content) and add your own documentation articles.
