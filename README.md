@@ -4,7 +4,7 @@
 
 A free, production-ready Astro theme for documentation sites, help centers, and knowledge bases. Static, fast, and fully customizable.
 
-[Live Demo](https://example.com) | [WordPress Version](https://supportgenix.com/)
+[Live Demo](https://astro.supportgenix.com) | [WordPress Version](https://supportgenix.com/)
 
 ## Features
 
