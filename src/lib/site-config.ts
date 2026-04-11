@@ -12,7 +12,7 @@ export const SITE_CONFIG = {
         terms: "#",
         privacy: "#",
         twitter: "#",
-        github: "#",
+        github: "https://github.com/supportgenix/supportgenix-docs",
     },
 } as const;
 

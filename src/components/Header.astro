@@ -75,7 +75,9 @@ const currentPath = Astro.url.pathname;
 
         <div class="flex items-center gap-6">
             <a
-                href={links.docsHome}
+                href={links.github}
+                target="_blank"
+                rel="noopener noreferrer"
                 class="hidden sm:inline-flex items-center px-7 py-3 bg-primary text-white text-[18px] leading-none font-medium rounded-full hover:bg-primary-dark transition-all active:scale-95 whitespace-nowrap"
             >
                 Get Started
@@ -199,7 +201,9 @@ const currentPath = Astro.url.pathname;
 
             <div class="mt-auto pt-8 space-y-3 border-t border-brand-gray-100">
                 <a
-                    href={links.docsHome}
+                    href={links.github}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     class="block w-full py-3 bg-primary text-white text-center font-bold rounded-xl active:scale-95 transition-all"
                     @click="mobileMenuOpen = false"
                 >
