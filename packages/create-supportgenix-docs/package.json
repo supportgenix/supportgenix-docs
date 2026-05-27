@@ -1,0 +1,48 @@
+{
+  "name": "create-supportgenix-docs",
+  "version": "0.1.0",
+  "description": "Add a full Astro knowledge base to any Astro 6+ project in one command.",
+  "type": "module",
+  "bin": {
+    "supportgenix-docs": "./dist/cli.js",
+    "create-supportgenix-docs": "./dist/cli.js"
+  },
+  "main": "./dist/cli.js",
+  "files": [
+    "dist",
+    "templates"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "start": "node dist/cli.js"
+  },
+  "keywords": [
+    "astro",
+    "docs",
+    "knowledge-base",
+    "supportgenix",
+    "cli",
+    "scaffold"
+  ],
+  "author": "SupportGenix",
+  "license": "ISC",
+  "homepage": "https://github.com/supportgenix/supportgenix-docs",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/supportgenix/supportgenix-docs.git",
+    "directory": "packages/create-supportgenix-docs"
+  },
+  "dependencies": {
+    "@clack/prompts": "^0.9.0",
+    "fs-extra": "^11.2.0",
+    "picocolors": "^1.1.0",
+    "semver": "^7.6.0"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^11.0.0",
+    "@types/node": "^22.0.0",
+    "@types/semver": "^7.5.0",
+    "typescript": "^5.5.0"
+  }
+}

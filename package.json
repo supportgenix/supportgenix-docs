@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "type": "module",
   "main": "index.js",
+  "workspaces": ["packages/*"],
   "homepage": "https://github.com/supportgenix/supportgenix-docs",
   "repository": {
     "type": "git",

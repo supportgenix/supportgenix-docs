@@ -1,0 +1,163 @@
+import fs from 'fs';
+import path from 'path';
+import type { DetectResult } from './detect.js';
+import type { DepsResult } from './deps.js';
+import type { ScaffoldResult } from './scaffold.js';
+import type { PatchResult } from './patches.js';
+import { log } from '@clack/prompts';
+import pc from 'picocolors';
+
+interface InstallDocOptions {
+  cwd: string;
+  detect: DetectResult;
+  deps: DepsResult;
+  depsInstalled: boolean;
+  skippedDeps: string[];
+  installPath: string;
+  withExamples: boolean;
+  scaffold: ScaffoldResult;
+  patches: PatchResult;
+  dryRun: boolean;
+}
+
+export function writeInstallDoc(opts: InstallDocOptions): void {
+  const now = new Date().toISOString().split('T')[0];
+  const outputPath = path.join(opts.cwd, 'supportgenix-docs-install.md');
+
+  const lines: string[] = [
+    `# SupportGenix Docs — Install Instructions`,
+    ``,
+    `> Generated: ${now}`,
+    `> Run \`npx supportgenix-docs init\` to re-run the installer.`,
+    ``,
+    `---`,
+    ``,
+    `## Project detected`,
+    ``,
+    `- **Astro version:** ${opts.detect.astroVersion}`,
+    `- **Config file:** ${opts.detect.astroConfigFile}`,
+    `- **content.config.ts:** ${opts.detect.hasContentConfig ? 'already existed (see manual step below)' : opts.patches.contentConfigCreated ? 'created by installer' : 'not found — see manual step below'}`,
+    ``,
+    `---`,
+    ``,
+    `## Files scaffolded`,
+    ``,
+  ];
+
+  if (opts.scaffold.written.length > 0) {
+    opts.scaffold.written.forEach(f => lines.push(`- \`${f}\``));
+  } else {
+    lines.push(`_No files were written (dry run or all skipped)._`);
+  }
+
+  if (opts.scaffold.skipped.length > 0) {
+    lines.push(``, `### Skipped (already existed)`, ``);
+    opts.scaffold.skipped.forEach(f => lines.push(`- \`${f}\``));
+  }
+
+  lines.push(``, `---`, ``);
+
+  // --- Dependencies ---
+  lines.push(`## Dependencies`);
+  lines.push(``);
+
+  const installedDeps = [
+    ...opts.deps.missing.filter(d => !opts.skippedDeps.includes(d)),
+    ...opts.deps.missingDev.filter(d => !opts.skippedDeps.includes(d)),
+  ];
+
+  if (installedDeps.length > 0) {
+    lines.push(`### Installed by installer`, ``);
+    installedDeps.forEach(d => lines.push(`- \`${d}\``));
+    lines.push(``);
+  }
+
+  if (opts.skippedDeps.length > 0) {
+    lines.push(`### Install manually`, ``);
+    lines.push(`Run these commands in your project root:`, ``);
+
+    const runtimeSkipped = opts.skippedDeps.filter(d => !['pagefind'].includes(d));
+    const devSkipped = opts.skippedDeps.filter(d => ['pagefind'].includes(d));
+
+    if (runtimeSkipped.length > 0) {
+      lines.push(`\`\`\`bash`);
+      lines.push(`npm install ${runtimeSkipped.join(' ')}`);
+      lines.push(`\`\`\``);
+    }
+    if (devSkipped.length > 0) {
+      lines.push(`\`\`\`bash`);
+      lines.push(`npm install -D ${devSkipped.join(' ')}`);
+      lines.push(`\`\`\``);
+    }
+    lines.push(``);
+  }
+
+  if (installedDeps.length === 0 && opts.skippedDeps.length === 0) {
+    lines.push(`All required dependencies were already installed.`, ``);
+  }
+
+  lines.push(`---`, ``);
+
+  // --- Manual config steps ---
+  lines.push(`## Manual steps required`, ``);
+  lines.push(`> These files were **not** modified automatically. Copy the snippets below into your project.`, ``);
+
+  let stepNum = 1;
+
+  // astro.config.mjs
+  if (opts.patches.astroConfigSnippet) {
+    lines.push(`### ${stepNum++}. Update \`${opts.detect.astroConfigFile}\``, ``);
+    lines.push(`\`\`\`js`);
+    lines.push(opts.patches.astroConfigSnippet);
+    lines.push(`\`\`\``, ``);
+  }
+
+  // content.config.ts
+  if (opts.detect.hasContentConfig) {
+    lines.push(`### ${stepNum++}. Add to \`src/content.config.ts\``, ``);
+    lines.push(`Your file already exists. Add the \`docs\` collection:`, ``);
+    lines.push(`\`\`\`ts`);
+    lines.push(opts.patches.contentConfigSnippet);
+    lines.push(`\`\`\``, ``);
+  }
+
+  // Global CSS
+  lines.push(`### ${stepNum++}. Add to your global CSS file`, ``);
+  lines.push(`\`\`\`css`);
+  lines.push(opts.patches.cssSnippet);
+  lines.push(`\`\`\``, ``);
+
+  lines.push(`---`, ``);
+
+  // --- Install summary ---
+  lines.push(`## Install summary`, ``);
+  lines.push(`- **Install path:** \`${opts.installPath}\``);
+  lines.push(`- **Sample docs:** ${opts.withExamples ? 'yes' : 'no'}`);
+  lines.push(`- **Content directory:** \`src/content/docs\``, ``);
+
+  // --- Next steps ---
+  lines.push(`---`, ``);
+  lines.push(`## Next steps`, ``);
+  lines.push(`\`\`\`bash`);
+  lines.push(`# Start the dev server`);
+  lines.push(`npm run dev`);
+  lines.push(``);
+  lines.push(`# Production build (required for Pagefind full-text search)`);
+  lines.push(`npm run build`);
+  lines.push(`\`\`\``);
+  lines.push(``);
+  lines.push(`> Pagefind search only works after a full build. In dev mode, the fallback JSON search is used automatically.`);
+  lines.push(``);
+  lines.push(`---`);
+  lines.push(`_Generated by [SupportGenix Docs](https://github.com/supportgenix/supportgenix-docs) installer_`);
+
+  const content = lines.join('\n');
+
+  if (opts.dryRun) {
+    log.info(`${pc.dim('[dry-run]')} Would write supportgenix-docs-install.md`);
+    return;
+  }
+
+  fs.writeFileSync(outputPath, content, 'utf-8');
+  log.step(`${pc.green('✓')} created  supportgenix-docs-install.md`);
+}
