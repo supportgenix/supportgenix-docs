@@ -1,0 +1,211 @@
+@import "tailwindcss";
+
+@theme {
+    /* Brand Colors */
+    --color-primary: #08ac53;
+    --color-primary-dark: #079a4a;
+    --color-primary-light: #20b464;
+
+    --color-secondary: #667eea;
+    --color-secondary-hover: #ff6e30;
+
+    --color-brand-gray-50: #f9fafb;
+    --color-brand-gray-100: #f3f4f6;
+    --color-brand-gray-200: #e5e7eb;
+    --color-brand-gray-300: #d1d5db;
+    --color-brand-gray-400: #9ca3af;
+    --color-brand-gray-500: #6b7280;
+    --color-brand-gray-600: #4b5563;
+    --color-brand-gray-700: #374151;
+    --color-brand-gray-800: #1f2937;
+    --color-brand-gray-900: #111827;
+
+    /* Legacy variable support for components we port */
+    --sgkb-primary: #08ac53;
+    --sgkb-secondary: #667eea;
+    --sgkb-radius-2xl: 1rem;
+    --sgkb-radius-3xl: 1.5rem;
+    --sgkb-shadow-custom: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+}
+
+@layer base {
+    :root {
+        --primary: #667eea;
+        --primary-dark: #764ba2;
+        --secondary: #39b54a;
+
+        /* Prose / Content Variables */
+        --sgkb-primary: #08ac53;
+        --sgkb-primary-rgb: 8, 172, 83;
+        --sgkb-primary-dark: #079a4a;
+        --sgkb-primary-light: #20b464;
+        --sgkb-bg-primary: #ffffff;
+        --sgkb-bg-secondary: #f9fafb;
+        --sgkb-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+        --sgkb-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+            0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        --sgkb-font-semibold: 600;
+        --sgkb-text-primary: #111827;
+        --sgkb-text-secondary: #4b5563;
+        --sgkb-text-tertiary: #9ca3af;
+        --sgkb-text-quaternary: #c4c8cf;
+        --sgkb-header-nav: #061331;
+        --sgkb-hero-from: #18b857;
+        --sgkb-hero-to: #12af53;
+        --sgkb-code-bg: #0f172a;
+        --sgkb-accent-warning: #f2a100;
+        --sgkb-primary-soft: #76cfa1;
+        --sgkb-border-soft: #eceef1;
+        --sgkb-border-soft-muted: #e4e5e7;
+        --sgkb-border-soft-green: #d7e9dc;
+        --sgkb-surface-subtle: #f8f9fb;
+        --sgkb-surface-active: #f0f2f4;
+        --sgkb-footer-bg: #f3f3f7;
+        --sgkb-footer-text: #585858;
+        --sgkb-footer-heading: #000000;
+        --sgkb-footer-border: #d8dbe3;
+        --sgkb-footer-bottom-border: #e4e6ee;
+        --sgkb-footer-btn-bg: #061331;
+        --sgkb-footer-btn-bg-hover: #0b1e44;
+        --sgkb-social-youtube: #ff0000;
+        --sgkb-social-facebook: #1877f2;
+        --sgkb-rating-star: #f59e0b;
+        --sgkb-shadow-xs-soft: 0 1px 3px rgba(15, 23, 42, 0.05);
+        --sgkb-shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.04);
+        --sgkb-shadow-primary-soft: 0 12px 26px rgba(8, 172, 83, 0.12);
+        --sgkb-search-focus-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
+        --sgkb-focus-ring: rgba(8, 172, 83, 0.25);
+        --sgkb-focus-shadow: 0 0 0 3px rgba(8, 172, 83, 0.15);
+        --sgkb-border-light: #f3f4f6;
+        --sgkb-secondary-dark: #764ba2;
+        --sgkb-scrollbar-track: #f1f1f1;
+        --sgkb-scrollbar-thumb: #ccc;
+        --sgkb-scrollbar-thumb-hover: #aaa;
+        --sgkb-overlay-soft: rgba(255, 255, 255, 0.1);
+        --sgkb-icon-muted: #a3a9b5;
+        --sgkb-text-subtle: #5b6372;
+        --sgkb-icon-light: #b4b8c0;
+        --sgkb-divider-muted: #b9bec7;
+        --sgkb-shadow-soft-lg: 0 6px 20px rgba(0, 0, 0, 0.14);
+        --sgkb-quote-bg: #f7fbf8;
+        --sgkb-success-text: #065f46;
+        --sgkb-shadow-code: 0 10px 30px -5px rgba(0, 0, 0, 0.1);
+        --sgkb-info-bg: #eff6ff;
+        --sgkb-info-border: #bfdbfe;
+        --sgkb-info-text: #1e40af;
+        --sgkb-warning-bg: #fffbeb;
+        --sgkb-warning-border: #fcd34d;
+        --sgkb-warning-text: #92400e;
+        --sgkb-success-bg: #ecfdf5;
+        --sgkb-success-border: #6ee7b7;
+        --sgkb-error-bg: #fff1f2;
+        --sgkb-error-border: #fda4af;
+        --sgkb-error-text: #9f1239;
+        --sgkb-tip-bg: #f0fdf4;
+        --sgkb-tip-border: #86efac;
+        --sgkb-tip-text: #14532d;
+    }
+
+    html {
+        font-family: 'Poppins', system-ui, sans-serif;
+        scroll-behavior: smooth;
+        @apply bg-brand-gray-50 text-brand-gray-900 antialiased;
+    }
+
+    body {
+        @apply min-h-screen flex flex-col;
+    }
+
+    p {
+        font-weight: 400;
+    }
+
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: var(--sgkb-scrollbar-track);
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: var(--sgkb-scrollbar-thumb);
+        border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: var(--sgkb-scrollbar-thumb-hover);
+    }
+}
+
+/* Animations from legacy CSS */
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-slide-down {
+    animation: slideDown 0.2s ease-out;
+}
+
+/* Glassmorphism utility */
+.glass {
+    background: var(--sgkb-overlay-soft);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--sgkb-overlay-soft);
+}
+
+/* Layout Utilities */
+.container-wide {
+    max-width: 1440px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+}
+
+@media (min-width: 1024px) {
+    .container-wide {
+        padding-left: 3rem;
+        padding-right: 3rem;
+    }
+}
+
+/* Responsive Prose Optimizations */
+.prose table {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-collapse: collapse;
+}
+
+.prose pre {
+    @apply text-sm sm:text-base;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Ensure images don't overflow */
+.prose img {
+    @apply max-w-full h-auto mx-auto;
+}
+
+/* Hide scrollbars but keep functionality if needed */
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+.no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}

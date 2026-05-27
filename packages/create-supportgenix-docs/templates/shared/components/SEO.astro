@@ -1,0 +1,157 @@
+---
+import { THEME_COLOR_PRIMARY } from "../lib/theme";
+import { SITE_CONFIG } from "../lib/site-config";
+
+interface Props {
+    title: string;
+    description?: string;
+    image?: string;
+    canonicalURL?: URL;
+    articleData?: {
+        publishedTime?: string;
+        modifiedTime?: string;
+        author?: string;
+        tags?: string[];
+    };
+}
+
+const {
+    title,
+    description = "A modern Astro documentation theme with MDX content collections, Tailwind styling, and Pagefind search.",
+    image = "/og-image.png", // Default image
+    canonicalURL = new URL(Astro.url.pathname, Astro.site),
+    articleData,
+} = Astro.props;
+
+const siteName = SITE_CONFIG.brandName;
+const locale = "en_US";
+const imageAlt = `${title} | ${siteName}`;
+
+// Build the Organization sameAs array from configured social links only.
+// Unconfigured links default to "#" in site-config.ts and are filtered out.
+const socialLinks = [
+    SITE_CONFIG.links.twitter,
+    SITE_CONFIG.links.github,
+].filter((url): url is string => typeof url === "string" && url !== "#" && url !== "");
+
+// Structured Data (JSON-LD)
+const organizationSchema = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: SITE_CONFIG.organizationName,
+    url: Astro.site,
+    logo: new URL("/favicon180x180.png", Astro.site),
+    ...(socialLinks.length > 0 && { sameAs: socialLinks }),
+};
+
+const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: Astro.url.pathname
+        .split("/")
+        .filter(Boolean)
+        .map((part, index, arr) => ({
+            "@type": "ListItem",
+            position: index + 1,
+            name:
+                part.charAt(0).toUpperCase() + part.slice(1).replace(/-/g, " "),
+            item: new URL("/" + arr.slice(0, index + 1).join("/"), Astro.site),
+        })),
+};
+
+let articleSchema: any = null;
+if (articleData) {
+    articleSchema = {
+        "@context": "https://schema.org",
+        "@type": "Article",
+        headline: title,
+        description: description,
+        image: [new URL(image, Astro.site)],
+        datePublished: articleData.publishedTime,
+        dateModified: articleData.modifiedTime,
+        author: [
+            {
+                "@type": "Person",
+                name: articleData.author || SITE_CONFIG.defaultAuthor,
+                url: Astro.site,
+            },
+        ],
+        publisher: organizationSchema,
+    };
+}
+---
+
+<!-- Global Metadata -->
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<link rel="icon" type="image/png" href="/favicon-32x32.png" />
+<meta name="generator" content={Astro.generator} />
+
+<!-- Canonical URL -->
+<link rel="canonical" href={canonicalURL} />
+
+<!-- Primary Meta Tags -->
+<title>{title} | {siteName}</title>
+<meta name="title" content={`${title} | ${siteName}`} />
+<meta name="description" content={description} />
+<meta name="theme-color" content={THEME_COLOR_PRIMARY} />
+
+<!-- Open Graph / Facebook -->
+<meta property="og:type" content={articleData ? "article" : "website"} />
+<meta property="og:url" content={Astro.url} />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:image" content={new URL(image, Astro.site)} />
+<meta property="og:image:alt" content={imageAlt} />
+<meta property="og:site_name" content={siteName} />
+<meta property="og:locale" content={locale} />
+
+<!-- Twitter -->
+<meta property="twitter:card" content="summary_large_image" />
+<meta property="twitter:url" content={Astro.url} />
+<meta property="twitter:title" content={title} />
+<meta property="twitter:description" content={description} />
+<meta property="twitter:image" content={new URL(image, Astro.site)} />
+<meta property="twitter:image:alt" content={imageAlt} />
+
+<!-- Article Meta -->
+{
+    articleData?.publishedTime && (
+        <meta
+            property="article:published_time"
+            content={articleData.publishedTime}
+        />
+    )
+}
+{
+    articleData?.modifiedTime && (
+        <meta
+            property="article:modified_time"
+            content={articleData.modifiedTime}
+        />
+    )
+}
+{
+    articleData?.author && (
+        <meta property="article:author" content={articleData.author} />
+    )
+}
+{articleData?.tags?.map((tag) => <meta property="article:tag" content={tag} />)}
+
+<!-- Structured Data -->
+<script
+    type="application/ld+json"
+    set:html={JSON.stringify(organizationSchema)}
+/>
+<script
+    type="application/ld+json"
+    set:html={JSON.stringify(breadcrumbSchema)}
+/>
+{
+    articleSchema && (
+        <script
+            type="application/ld+json"
+            set:html={JSON.stringify(articleSchema)}
+        />
+    )
+}

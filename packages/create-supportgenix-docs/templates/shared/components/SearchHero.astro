@@ -1,0 +1,59 @@
+﻿---
+import Search from "./Search.astro";
+
+interface Props {
+    articleCount?: number;
+    categoryCount?: number;
+    lastUpdatedLabel?: string;
+}
+
+const {
+    articleCount = 0,
+    categoryCount = 0,
+    lastUpdatedLabel = "recently",
+} = Astro.props;
+---
+
+<section class="relative overflow-visible bg-gradient-to-br from-[var(--sgkb-hero-from)] to-[var(--sgkb-hero-to)]">
+    <div
+        class="container-wide text-center text-white relative z-10 py-12 px-4 sm:px-0 sm:py-20"
+    >
+        <h1 class="font-['Poppins'] text-[1.75rem] sm:text-[clamp(2rem,5vw,3rem)] font-bold leading-[1.2] tracking-[-0.02em] mb-4">
+            How can we help?
+        </h1>
+        <p class="font-['Poppins'] text-[0.95rem] sm:text-[clamp(1rem,2vw,1.25rem)] leading-[1.6] opacity-90 max-w-[600px] mx-auto px-4 sm:px-0 mb-10">
+            Search our knowledge base or browse categories below
+        </p>
+
+        <div class="max-w-[600px] mx-auto mb-6 px-4 sm:px-0">
+            <Search />
+        </div>
+
+        <div class="flex justify-center flex-wrap gap-3 sm:gap-6 mt-6 sm:mt-8 pt-6 sm:pt-8 px-4 sm:px-0 border-t border-white/15">
+            <div class="flex-1 sm:flex-none min-w-[90px] sm:min-w-[110px] px-4 sm:px-6 py-3 sm:py-[14px] rounded-xl bg-white/10 border border-white/15 text-center backdrop-blur-[10px]">
+                <div class="font-['Poppins'] text-[1.125rem] sm:text-[clamp(1.25rem,2.5vw,1.5rem)] font-semibold leading-[1.1]">
+                    {articleCount}
+                </div>
+                <div class="font-['Poppins'] text-[10px] sm:text-[11px] uppercase tracking-[0.5px] font-medium opacity-80 mt-2">
+                    Articles
+                </div>
+            </div>
+            <div class="flex-1 sm:flex-none min-w-[90px] sm:min-w-[110px] px-4 sm:px-6 py-3 sm:py-[14px] rounded-xl bg-white/10 border border-white/15 text-center backdrop-blur-[10px]">
+                <div class="font-['Poppins'] text-[1.125rem] sm:text-[clamp(1.25rem,2.5vw,1.5rem)] font-semibold leading-[1.1]">
+                    {categoryCount}
+                </div>
+                <div class="font-['Poppins'] text-[10px] sm:text-[11px] uppercase tracking-[0.5px] font-medium opacity-80 mt-2">
+                    Categories
+                </div>
+            </div>
+            <div class="basis-full sm:basis-auto sm:min-w-[180px] px-4 sm:px-6 py-3 sm:py-[14px] rounded-xl bg-white/10 border border-white/15 text-center backdrop-blur-[10px]">
+                <div class="font-['Poppins'] text-[1.125rem] sm:text-[clamp(1.25rem,2.5vw,1.5rem)] font-semibold leading-[1.1]">
+                    {lastUpdatedLabel}
+                </div>
+                <div class="font-['Poppins'] text-[10px] sm:text-[11px] uppercase tracking-[0.5px] font-medium opacity-80 mt-2">
+                    Last Updated
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

@@ -1,0 +1,43 @@
+---
+interface Props {
+    type?: "info" | "warning" | "success" | "error" | "tip";
+    title?: string;
+}
+
+const { type = "info", title } = Astro.props;
+
+const styles = {
+    info: "bg-blue-50 border-blue-100 text-blue-800",
+    warning: "bg-amber-50 border-amber-100 text-amber-800",
+    success: "bg-emerald-50 border-emerald-100 text-emerald-800",
+    error: "bg-rose-50 border-rose-100 text-rose-800",
+    tip: "bg-primary/5 border-primary/10 text-brand-gray-900",
+};
+
+const icons = {
+    info: '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>',
+    warning:
+        '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>',
+    success:
+        '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',
+    error: '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>',
+    tip: '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .5 2.2 1.5 3.1.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>',
+};
+---
+
+<div
+    class:list={[
+        "sgkb-admonition",
+        `sgkb-admonition-${type}`,
+        "p-6 rounded-3xl border flex gap-4 my-8",
+        styles[type],
+    ]}
+>
+    <div class="flex-shrink-0 opacity-80" set:html={icons[type]} />
+    <div class="flex-grow">
+        {title && <h5 class="font-bold mb-1">{title}</h5>}
+        <div class="text-sm leading-relaxed">
+            <slot />
+        </div>
+    </div>
+</div>

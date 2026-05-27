@@ -23,8 +23,14 @@ interface ScaffoldOptions {
 
 /** Replace template placeholders in file content */
 function applyTemplateVars(content: string, installPath: string): string {
+  // BASE_PATH: empty string for root install, /docs or /help for subpath installs
+  const basePath = installPath === '/' ? '' : installPath;
+  // DOCS_HOME: always a usable href — '/' for root, '/docs' etc for subpath
+  const docsHome = installPath === '/' ? '/' : installPath;
+
   return content
-    .replace(/\{\{BASE_PATH\}\}/g, installPath)
+    .replace(/\{\{BASE_PATH\}\}/g, basePath)
+    .replace(/\{\{DOCS_HOME\}\}/g, docsHome)
     .replace(/\{\{CONTENT_DIR\}\}/g, 'src/content/docs');
 }
 
@@ -166,6 +172,20 @@ export async function scaffold(options: ScaffoldOptions): Promise<ScaffoldResult
     overwriteAll,
     result
   );
+
+  // --- Shared pages (search-index.json.ts) → always src/pages/ ---
+  // For root installs this is already in the root-route template.
+  // For subpath installs we copy it separately so it lives at src/pages/ not src/pages/docs/.
+  if (!isRoot) {
+    await copyDir(
+      path.join(TEMPLATES_DIR, 'shared-pages'),
+      path.join(cwd, 'src', 'pages'),
+      installPath,
+      options,
+      overwriteAll,
+      result
+    );
+  }
 
   // --- Content: empty placeholder or sample docs ---
   const contentTemplate = withExamples ? 'content-sample' : 'content-empty';
