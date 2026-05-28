@@ -107,7 +107,7 @@
     }
 
     html {
-        font-family: 'Poppins', system-ui, sans-serif;
+        font-family: inherit;
         scroll-behavior: smooth;
         @apply bg-brand-gray-50 text-brand-gray-900 antialiased;
     }

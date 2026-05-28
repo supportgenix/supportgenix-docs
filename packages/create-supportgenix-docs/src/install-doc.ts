@@ -121,12 +121,6 @@ export function writeInstallDoc(opts: InstallDocOptions): void {
     lines.push(`\`\`\``, ``);
   }
 
-  // Global CSS
-  lines.push(`### ${stepNum++}. Add to your global CSS file`, ``);
-  lines.push(`\`\`\`css`);
-  lines.push(opts.patches.cssSnippet);
-  lines.push(`\`\`\``, ``);
-
   lines.push(`---`, ``);
 
   // --- Install summary ---

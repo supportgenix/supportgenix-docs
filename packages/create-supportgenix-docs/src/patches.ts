@@ -7,7 +7,6 @@ import pc from 'picocolors';
 export interface PatchResult {
   astroConfigSnippet: string;
   contentConfigSnippet: string;
-  cssSnippet: string;
   contentConfigCreated: boolean;
 }
 
@@ -79,15 +78,6 @@ const docs = defineCollection({
 export const collections = { docs };`;
 }
 
-/** CSS import snippet for Poppins font */
-function buildCssSnippet(): string {
-  return `/* Add to your global CSS file (e.g. src/assets/styles/global.css) */
-@import '@fontsource/poppins/400.css';
-@import '@fontsource/poppins/500.css';
-@import '@fontsource/poppins/600.css';
-@import '@fontsource/poppins/700.css';`;
-}
-
 const CONTENT_CONFIG_TEMPLATE = `import { defineCollection, z } from 'astro:content';
 import { glob } from 'astro/loaders';
 
@@ -113,7 +103,6 @@ export function applyPatches(
 ): PatchResult {
   const astroConfigSnippet = buildAstroConfigSnippet(existingDeps);
   const contentConfigSnippet = buildContentConfigSnippet();
-  const cssSnippet = buildCssSnippet();
   let contentConfigCreated = false;
 
   // --- astro.config.mjs: always print, never auto-merge ---
@@ -150,18 +139,9 @@ export function applyPatches(
     );
   }
 
-  // --- Global CSS: always print ---
-  log.info(
-    `Add Poppins font imports to your global CSS file:\n\n` +
-    pc.dim(DIVIDER) + '\n' +
-    cssSnippet + '\n' +
-    pc.dim(DIVIDER)
-  );
-
   return {
     astroConfigSnippet,
     contentConfigSnippet,
-    cssSnippet,
     contentConfigCreated,
   };
 }
