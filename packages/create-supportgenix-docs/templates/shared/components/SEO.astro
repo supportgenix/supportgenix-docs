@@ -15,11 +15,14 @@ interface Props {
     };
 }
 
+const siteUrl = Astro.site ?? Astro.url.origin;
+const resolveUrl = (value: string) => new URL(value, siteUrl);
+
 const {
     title,
     description = "A modern Astro documentation theme with MDX content collections, Tailwind styling, and Pagefind search.",
     image = "/og-image.png", // Default image
-    canonicalURL = new URL(Astro.url.pathname, Astro.site),
+    canonicalURL = resolveUrl(Astro.url.pathname),
     articleData,
 } = Astro.props;
 
@@ -39,8 +42,8 @@ const organizationSchema = {
     "@context": "https://schema.org",
     "@type": "Organization",
     name: SITE_CONFIG.organizationName,
-    url: Astro.site,
-    logo: new URL("/favicon180x180.png", Astro.site),
+    url: siteUrl,
+    logo: resolveUrl("/favicon180x180.png"),
     ...(socialLinks.length > 0 && { sameAs: socialLinks }),
 };
 
@@ -55,7 +58,7 @@ const breadcrumbSchema = {
             position: index + 1,
             name:
                 part.charAt(0).toUpperCase() + part.slice(1).replace(/-/g, " "),
-            item: new URL("/" + arr.slice(0, index + 1).join("/"), Astro.site),
+            item: resolveUrl("/" + arr.slice(0, index + 1).join("/")),
         })),
 };
 
@@ -66,14 +69,14 @@ if (articleData) {
         "@type": "Article",
         headline: title,
         description: description,
-        image: [new URL(image, Astro.site)],
+        image: [resolveUrl(image)],
         datePublished: articleData.publishedTime,
         dateModified: articleData.modifiedTime,
         author: [
             {
                 "@type": "Person",
                 name: articleData.author || SITE_CONFIG.defaultAuthor,
-                url: Astro.site,
+                url: siteUrl,
             },
         ],
         publisher: organizationSchema,
@@ -101,7 +104,7 @@ if (articleData) {
 <meta property="og:url" content={Astro.url} />
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description} />
-<meta property="og:image" content={new URL(image, Astro.site)} />
+<meta property="og:image" content={resolveUrl(image)} />
 <meta property="og:image:alt" content={imageAlt} />
 <meta property="og:site_name" content={siteName} />
 <meta property="og:locale" content={locale} />
@@ -111,7 +114,7 @@ if (articleData) {
 <meta property="twitter:url" content={Astro.url} />
 <meta property="twitter:title" content={title} />
 <meta property="twitter:description" content={description} />
-<meta property="twitter:image" content={new URL(image, Astro.site)} />
+<meta property="twitter:image" content={resolveUrl(image)} />
 <meta property="twitter:image:alt" content={imageAlt} />
 
 <!-- Article Meta -->
