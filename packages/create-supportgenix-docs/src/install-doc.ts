@@ -28,7 +28,7 @@ export function writeInstallDoc(opts: InstallDocOptions): void {
     `# SupportGenix Docs — Install Instructions`,
     ``,
     `> Generated: ${now}`,
-    `> Run \`npx supportgenix-docs init\` to re-run the installer.`,
+    `> Run \`npm create supportgenix-docs@latest\` to re-run the installer.`,
     ``,
     `---`,
     ``,

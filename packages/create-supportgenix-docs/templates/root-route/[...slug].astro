@@ -1,8 +1,8 @@
 ---
 import { getCollection, render } from "astro:content";
 import type { CollectionEntry } from "astro:content";
-import DocsLayout from "../layouts/DocsLayout.astro";
-import { getDocSlug, getDocUrl } from "../lib/docs";
+import DocsLayout from "../supportgenix-docs/layouts/DocsLayout.astro";
+import { getDocSlug, getDocUrl } from "../supportgenix-docs/lib/docs";
 
 export async function getStaticPaths() {
     const docs = await getCollection("docs");

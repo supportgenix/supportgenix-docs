@@ -11,8 +11,7 @@ npm create supportgenix-docs@latest
 The CLI scaffolds a complete docs system into your existing Astro project:
 
 - **Pages** — docs index, individual article pages, and category listing pages
-- **Layouts** — `DocsLayout` (three-column with sidebar + TOC) and `Layout` (base wrapper)
-- **Components** — search, sidebar, table of contents, header, footer, and more
+- **SupportGenix UI** — namespaced layouts, components, helpers, and styles under `src/supportgenix-docs/`
 - **Styles** — Tailwind CSS 4 design tokens and global CSS
 - **Content** — an empty `src/content/docs/` folder ready for your `.mdx` files
 - **Search** — dual-mode search (Pagefind post-build + JSON fallback in dev)
@@ -57,7 +56,7 @@ npm create supportgenix-docs@latest -- --dry-run --yes
 
 The CLI checks for missing packages and offers to install them:
 
-**dependencies** — `@astrojs/mdx`, `@astrojs/alpinejs`, `alpinejs`, `@tailwindcss/vite`, `tailwindcss`, `@fontsource/inter`
+**dependencies** — `@astrojs/mdx`, `@astrojs/alpinejs`, `alpinejs`, `@tailwindcss/vite`, `tailwindcss`
 
 **devDependencies** — `pagefind`
 

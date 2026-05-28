@@ -137,40 +137,37 @@ export async function scaffold(options: ScaffoldOptions): Promise<ScaffoldResult
     result
   );
 
-  // --- Layouts ---
+  // --- SupportGenix-owned files ---
   await copyDir(
     path.join(TEMPLATES_DIR, 'shared', 'layouts'),
-    path.join(cwd, 'src', 'layouts'),
+    path.join(cwd, 'src', 'supportgenix-docs', 'layouts'),
     installPath,
     options,
     overwriteAll,
     result
   );
 
-  // --- Components ---
   await copyDir(
     path.join(TEMPLATES_DIR, 'shared', 'components'),
-    path.join(cwd, 'src', 'components'),
+    path.join(cwd, 'src', 'supportgenix-docs', 'components'),
     installPath,
     options,
     overwriteAll,
     result
   );
 
-  // --- Lib ---
   await copyDir(
     path.join(TEMPLATES_DIR, 'shared', 'lib'),
-    path.join(cwd, 'src', 'lib'),
+    path.join(cwd, 'src', 'supportgenix-docs', 'lib'),
     installPath,
     options,
     overwriteAll,
     result
   );
 
-  // --- Styles ---
   await copyDir(
     path.join(TEMPLATES_DIR, 'shared', 'styles'),
-    path.join(cwd, 'src', 'assets', 'styles'),
+    path.join(cwd, 'src', 'supportgenix-docs', 'styles'),
     installPath,
     options,
     overwriteAll,

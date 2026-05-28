@@ -1,10 +1,10 @@
 ---
 import { getCollection } from "astro:content";
-import Layout from "../../layouts/Layout.astro";
-import SearchHero from "../../components/SearchHero.astro";
-import CategoryCard from "../../components/CategoryCard.astro";
-import FeaturedCard from "../../components/FeaturedCard.astro";
-import { getDocUrl } from "../../lib/docs";
+import Layout from "../../supportgenix-docs/layouts/Layout.astro";
+import SearchHero from "../../supportgenix-docs/components/SearchHero.astro";
+import CategoryCard from "../../supportgenix-docs/components/CategoryCard.astro";
+import FeaturedCard from "../../supportgenix-docs/components/FeaturedCard.astro";
+import { getDocUrl } from "../../supportgenix-docs/lib/docs";
 
 const allDocs = await getCollection("docs");
 

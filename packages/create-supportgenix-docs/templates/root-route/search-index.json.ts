@@ -1,6 +1,6 @@
 import { getCollection } from "astro:content";
 import type { APIRoute } from "astro";
-import { getDocUrl } from "../lib/docs";
+import { getDocUrl } from "../supportgenix-docs/lib/docs";
 
 export const prerender = true;
 

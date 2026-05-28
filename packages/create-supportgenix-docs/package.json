@@ -1,6 +1,6 @@
 {
   "name": "create-supportgenix-docs",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Add a full Astro knowledge base to any Astro 6+ project in one command.",
   "type": "module",
   "bin": {

@@ -1,6 +1,7 @@
 ---
-import { Image } from "astro:assets";
-import logo from "../assets/images/logo.png";
+import { SITE_CONFIG } from "../lib/site-config";
 ---
 
-<Image src={logo} alt="Support Genix" class="h-10 w-auto max-w-[150px] lg:max-w-[200px] object-contain" />
+<span class="text-lg font-semibold text-[var(--sgkb-text-primary)]">
+	{SITE_CONFIG.name}
+</span>

@@ -52,7 +52,7 @@ export function detect(cwd: string): DetectResult {
       `   Run this command inside an existing Astro site, or create one first:\n\n` +
       `     ${pc.cyan('npm create astro@latest')}\n` +
       `     ${pc.cyan('cd your-site')}\n` +
-      `     ${pc.cyan('npx supportgenix-docs init')}`
+      `     ${pc.cyan('npm create supportgenix-docs@latest')}`
     );
   }
 
