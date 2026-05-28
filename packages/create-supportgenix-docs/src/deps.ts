@@ -15,6 +15,7 @@ const REQUIRED_DEPS = [
   'alpinejs',
   '@tailwindcss/vite',
   'tailwindcss',
+  '@fontsource/poppins',
 ];
 
 // Required dev dependencies

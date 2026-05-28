@@ -19,6 +19,7 @@ interface ScaffoldOptions {
   withExamples: boolean;
   dryRun: boolean;
   force: boolean;
+  yes: boolean;
 }
 
 /** Replace template placeholders in file content */
@@ -46,14 +47,14 @@ async function copyFile(
   const exists = fs.existsSync(dest);
 
   if (exists && !options.force) {
-    // Already decided for all files
+    // dry-run and --yes both skip existing files without prompting
     if (overwriteAll.value === true) {
       // fall through to write
     } else if (overwriteAll.value === false) {
       log.warn(`  ${pc.dim('skipped')}  ${relDest} (already exists)`);
       return 'skipped';
     } else {
-      // Ask per-file
+      // Interactive: ask per-file (only reached when neither --yes nor --force nor --dry-run)
       const choice = await confirm({
         message: `${pc.yellow(relDest)} already exists. Overwrite?`,
         initialValue: false,
@@ -114,9 +115,12 @@ async function copyDir(
 }
 
 export async function scaffold(options: ScaffoldOptions): Promise<ScaffoldResult> {
-  const { cwd, installPath, withExamples, dryRun, force } = options;
+  const { cwd, installPath, withExamples, dryRun, force, yes } = options;
   const result: ScaffoldResult = { written: [], skipped: [] };
-  const overwriteAll: { value: boolean | null } = { value: force ? true : null };
+  // force → overwrite all | yes or dry-run → skip existing silently | otherwise → prompt per file
+  const overwriteAll: { value: boolean | null } = {
+    value: force ? true : (yes || dryRun) ? false : null,
+  };
 
   const isRoot = installPath === '/';
   const routeTemplate = isRoot ? 'root-route' : 'docs-route';
@@ -188,10 +192,11 @@ export async function scaffold(options: ScaffoldOptions): Promise<ScaffoldResult
   }
 
   // --- Content: empty placeholder or sample docs ---
+  // Templates contain a docs/ subfolder, so dest is src/content (not src/content/docs)
   const contentTemplate = withExamples ? 'content-sample' : 'content-empty';
   await copyDir(
     path.join(TEMPLATES_DIR, contentTemplate),
-    path.join(cwd, 'src', 'content', 'docs'),
+    path.join(cwd, 'src', 'content'),
     installPath,
     options,
     overwriteAll,

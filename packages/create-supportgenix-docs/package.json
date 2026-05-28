@@ -4,7 +4,6 @@
   "description": "Add a full Astro knowledge base to any Astro 6+ project in one command.",
   "type": "module",
   "bin": {
-    "supportgenix-docs": "./dist/cli.js",
     "create-supportgenix-docs": "./dist/cli.js"
   },
   "main": "./dist/cli.js",

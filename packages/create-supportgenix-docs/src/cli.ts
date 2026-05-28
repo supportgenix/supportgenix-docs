@@ -63,6 +63,7 @@ async function main() {
     withExamples: options.withExamples,
     dryRun: flags.dryRun,
     force: flags.force,
+    yes: flags.yes,
   });
 
   const fileCount = scaffoldResult.written.length;
