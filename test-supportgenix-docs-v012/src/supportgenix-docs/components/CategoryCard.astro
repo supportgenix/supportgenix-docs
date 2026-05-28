@@ -1,0 +1,49 @@
+﻿---
+interface Props {
+    title: string;
+    description: string;
+    icon: string;
+    count: number;
+    href: string;
+    articles: { title: string; href: string }[];
+}
+
+const { title, description, icon: _icon, count, href, articles } = Astro.props;
+---
+
+<div class="group relative overflow-hidden bg-white rounded-2xl border border-[var(--sgkb-border-soft)] px-6 py-6 hover:border-[var(--sgkb-primary-soft)] hover:-translate-y-[1px] hover:shadow-[var(--sgkb-shadow-primary-soft)] transition-all duration-200 flex flex-col before:absolute before:inset-x-0 before:top-0 before:h-1 before:bg-primary before:origin-left before:scale-x-0 hover:before:scale-x-100 before:transition-transform before:duration-300">
+    <div class="flex items-start gap-3.5 mb-5">
+        <div class="sgkb-category-icon w-[42px] h-[42px] bg-primary rounded-xl flex items-center justify-center text-white flex-shrink-0 transition-transform duration-200 ease-out group-hover:scale-110 group-hover:rotate-[5deg]">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M9 12H15M9 16H15M17 21H7C5.89543 21 5 20.1046 5 19V5C5 3.89543 5.89543 3 7 3H12.5858C12.851 3 13.1054 3.10536 13.2929 3.29289L18.7071 8.70711C18.8946 8.89464 19 9.149 19 9.41421V19C19 20.1046 18.1046 21 17 21Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+            </svg>
+        </div>
+        <div>
+            <h3 class="text-[20px] font-semibold text-brand-gray-900 leading-[1.25]">
+                <a href={href} class="hover:text-primary transition-colors">{title}</a>
+            </h3>
+            <span class="text-[12px] leading-none font-normal text-brand-gray-400">{count} articles</span>
+        </div>
+    </div>
+
+    <p class="text-[14px] text-brand-gray-500 leading-[1.55] mb-6 line-clamp-4">{description}</p>
+
+    <div class="space-y-2.5 flex-grow">
+        {
+            articles.map((article) => (
+                <a
+                    href={article.href}
+                    class="group/article flex items-start gap-2 text-[14px] text-brand-gray-500 hover:text-primary transition-colors"
+                >
+                    <span class="text-[var(--sgkb-text-quaternary)] mt-[1px] flex-shrink-0 transition-all group-hover/article:text-primary group-hover/article:translate-x-[3px]">&rarr;</span>
+                    <span class="leading-[1.4] line-clamp-2">{article.title}</span>
+                </a>
+            ))
+        }
+    </div>
+
+    <a href={href} class="group/view inline-flex items-center gap-1.5 mt-6 pt-1 text-[14px] font-semibold text-primary hover:text-primary-dark transition-all hover:translate-x-[3px]">
+        View all articles
+        <span class="transition-transform group-hover/view:translate-x-[2px]">&rarr;</span>
+    </a>
+</div>

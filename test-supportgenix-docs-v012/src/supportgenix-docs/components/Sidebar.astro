@@ -1,0 +1,128 @@
+---
+import { getDocsByCategory, getDocSlug, getDocUrl } from "../lib/docs";
+
+const categories = await getDocsByCategory();
+const categoryOrder = [
+    "Basic",
+    "Email Piping",
+    "Integration",
+    "Knowledge Base",
+    "FAQs",
+];
+const sortedCategoryNames = Object.keys(categories).sort((a, b) => {
+    const aIndex = categoryOrder.indexOf(a);
+    const bIndex = categoryOrder.indexOf(b);
+    const normalizedA = aIndex === -1 ? Number.MAX_SAFE_INTEGER : aIndex;
+    const normalizedB = bIndex === -1 ? Number.MAX_SAFE_INTEGER : bIndex;
+    if (normalizedA === normalizedB) return a.localeCompare(b);
+    return normalizedA - normalizedB;
+});
+
+interface Props {
+    currentSlug?: string;
+}
+
+const { currentSlug } = Astro.props;
+const activeCategory = sortedCategoryNames.find((category) =>
+    categories[category].some((doc) => getDocSlug(doc) === currentSlug),
+);
+---
+
+<div class="w-full rounded-2xl border border-[var(--sgkb-border-soft-muted)] bg-white overflow-hidden shadow-[var(--sgkb-shadow-xs)]">
+    <nav class="max-h-[calc(100vh-11rem)] overflow-y-auto custom-scrollbar no-scrollbar lg:no-scrollbar-off">
+        {
+            sortedCategoryNames.map((category, index) => {
+                const docs = categories[category];
+                const isOpen = activeCategory
+                    ? activeCategory === category
+                    : index === 0;
+
+                return (
+                    <details class="group/category border-b border-[var(--sgkb-border-soft)] last:border-b-0" open={isOpen}>
+                        <summary class="list-none cursor-pointer select-none px-4 py-4 flex items-center justify-between gap-3 text-brand-gray-700 hover:bg-brand-gray-50 transition-colors">
+                            <span class="inline-flex items-center gap-2.5 min-w-0">
+                                <svg
+                                    class="w-4 h-4 text-brand-gray-400 flex-shrink-0 transition-transform group-open/category:rotate-90"
+                                    viewBox="0 0 20 20"
+                                    fill="none"
+                                    aria-hidden="true"
+                                >
+                                    <path
+                                        d="M7 5L12 10L7 15"
+                                        stroke="currentColor"
+                                        stroke-width="1.8"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                    />
+                                </svg>
+                                <span class="text-[16px] leading-[1.35] font-semibold text-brand-gray-700">
+                                    {category}
+                                </span>
+                            </span>
+                            <span class="inline-flex items-center justify-center min-w-[30px] h-[30px] px-2 rounded-[10px] bg-brand-gray-100 text-brand-gray-400 text-[12px] font-semibold">
+                                {docs.length}
+                            </span>
+                        </summary>
+
+                        <ul class="bg-[var(--sgkb-surface-subtle)] py-1">
+                            {
+                                docs.map((doc) => {
+                                    const isActive = currentSlug === getDocSlug(doc);
+                                    return (
+                                        <li>
+                                            <a
+                                                href={getDocUrl(doc)}
+                                                class:list={[
+                                                    "block px-5 py-3 text-[15px] leading-[1.45] transition-colors",
+                                                    isActive
+                                                        ? "bg-[var(--sgkb-surface-active)] text-primary border-l-[3px] border-primary pl-[17px] font-semibold"
+                                                        : "text-brand-gray-700 border-l-[3px] border-transparent hover:text-primary",
+                                                ]}
+                                            >
+                                                {doc.data.title}
+                                            </a>
+                                        </li>
+                                    );
+                                })
+                            }
+                        </ul>
+                    </details>
+                );
+            })
+        }
+    </nav>
+</div>
+
+<style>
+    summary::-webkit-details-marker {
+        display: none;
+    }
+
+    .no-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
+    .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+
+    @media (min-width: 1024px) {
+        .lg:no-scrollbar-off::-webkit-scrollbar {
+            display: block;
+        }
+    }
+
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: var(--color-brand-gray-200);
+        border-radius: 10px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: var(--color-brand-gray-300);
+    }
+</style>

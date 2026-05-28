@@ -1,0 +1,52 @@
+---
+interface Props {
+    headings: {
+        depth: number;
+        slug: string;
+        text: string;
+    }[];
+}
+
+const { headings } = Astro.props;
+const filteredHeadings = headings.filter((h) => h.depth > 1 && h.depth <= 3);
+---
+
+{
+    filteredHeadings.length > 0 && (
+        <nav
+            class="sticky top-24 rounded-2xl border border-brand-gray-200 bg-white p-6 shadow-[var(--sgkb-shadow-xs)]"
+            aria-label="Table of contents"
+            x-data="{
+                activeId: '',
+                init() {
+                    const observer = new IntersectionObserver((entries) => {
+                        entries.forEach(entry => {
+                            if (entry.isIntersecting) {
+                                this.activeId = entry.target.id;
+                            }
+                        });
+                    }, { rootMargin: '0% 0% -80% 0%' });
+
+                    document.querySelectorAll('h2, h3').forEach(h => observer.observe(h));
+                }
+            }"
+        >
+            <h5 class="text-[12px] font-semibold uppercase tracking-[0.14em] text-brand-gray-500 mb-5">
+                On this page
+            </h5>
+            <ul class="space-y-1.5">
+                {filteredHeadings.map((h) => (
+                    <li>
+                        <a
+                            href={`#${h.slug}`}
+                            class="block border-l-[3px] pl-3 py-2 text-[16px] leading-[1.45] text-brand-gray-600 transition-colors"
+                            :class={`activeId === '${h.slug}' ? 'text-primary border-primary font-semibold' : 'border-transparent hover:text-primary hover:border-primary'`}
+                        >
+                            {h.text}
+                        </a>
+                    </li>
+                ))}
+            </ul>
+        </nav>
+    )
+}

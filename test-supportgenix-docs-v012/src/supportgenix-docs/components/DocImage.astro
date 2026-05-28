@@ -1,0 +1,71 @@
+---
+import { Image } from "astro:assets";
+import type { ImageMetadata } from "astro";
+
+interface Props {
+    src: string | ImageMetadata;
+    alt: string;
+    caption?: string;
+    class?: string;
+}
+
+const { src, alt, caption, class: className } = Astro.props;
+
+// If src is a string, we need to resolve it
+// We assume it's a path relative to src/content/docs/ which was migrated to point to src/assets/images/docs/
+// Example: "../../assets/images/docs/image.png"
+
+let imageModule: any;
+
+if (typeof src === "string") {
+    const images = import.meta.glob<{ default: ImageMetadata }>(
+        "/src/assets/images/docs/**/*.{jpeg,jpg,png,gif,webp,svg,avif}",
+    );
+
+    // The path in MDX looks like "../../assets/images/docs/filename.png"
+    // We need to resolve it to an absolute path from project root for import.meta.glob
+    // Since our script uses a fixed structure, we can just grab the filename
+    const filename = src.split("/").pop();
+    const imagePath = `/src/assets/images/docs/${filename}`;
+
+    if (images[imagePath]) {
+        imageModule = await images[imagePath]();
+    } else {
+        console.warn(`DocImage: Could not find image at ${imagePath}`);
+    }
+} else {
+    imageModule = { default: src };
+}
+---
+
+<figure class:list={["my-12 group", className]}>
+    <div
+        class="relative overflow-hidden"
+    >
+        {
+            imageModule ? (
+                <Image
+                    src={imageModule.default}
+                    alt={alt}
+                    class="w-full h-auto object-cover transition-transform duration-700"
+                    loading="lazy"
+                    format="webp"
+                    quality="high"
+                />
+            ) : (
+                <div class="bg-brand-gray-100 aspect-video flex items-center justify-center text-brand-gray-400 text-sm italic">
+                    Image not found: {src}
+                </div>
+            )
+        }
+
+    </div>
+
+    {
+        caption && (
+            <figcaption class="mt-4 text-center text-sm text-brand-gray-500 font-medium italic">
+                {caption}
+            </figcaption>
+        )
+    }
+</figure>

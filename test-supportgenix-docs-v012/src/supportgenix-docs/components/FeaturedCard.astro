@@ -1,0 +1,44 @@
+﻿---
+interface Props {
+    title: string;
+    category: string;
+    href: string;
+    date: string;
+    description?: string;
+}
+
+const {
+    title,
+    category,
+    href,
+    date,
+    description = "Learn how to get started with this feature and optimize your workflow with SupportGenix.",
+} = Astro.props;
+---
+
+<div
+    class="group relative block h-full overflow-hidden rounded-2xl border border-brand-gray-100 bg-[linear-gradient(135deg,var(--sgkb-bg-primary)_0%,var(--sgkb-bg-secondary)_100%)] px-6 py-6 shadow-[var(--sgkb-shadow-xs-soft)] transition-all duration-200 hover:border-[var(--sgkb-border-soft-green)] hover:-translate-y-1 hover:shadow-[var(--sgkb-shadow-lg)] before:absolute before:left-0 before:top-0 before:h-full before:w-full before:bg-[linear-gradient(135deg,var(--sgkb-primary)_0%,var(--sgkb-primary-light)_100%)] before:opacity-0 before:transition-all before:duration-300 before:pointer-events-none hover:before:opacity-[0.05]"
+>
+    <div class="relative z-10 flex h-full flex-col">
+        <div class="mb-4">
+            <span class="inline-flex items-center h-[28px] px-4 rounded-full bg-[var(--sgkb-accent-warning)] text-white text-xs font-bold uppercase tracking-wide">
+                Featured
+            </span>
+        </div>
+        <h4 class="text-[20px] leading-[1.35] font-semibold text-brand-gray-900 line-clamp-3 mb-3">
+            <a href={href} class="hover:text-primary transition-colors">
+                {title}
+            </a>
+        </h4>
+        <p class="text-[14px] text-brand-gray-500 leading-[1.55] mb-6 line-clamp-3">
+            {description}
+        </p>
+        <a
+            href={href}
+            class="group/read mt-auto inline-flex items-center gap-2 text-[14px] font-semibold text-primary hover:text-primary-dark transition-all hover:translate-x-[3px]"
+        >
+            Read more
+            <span class="transition-transform group-hover/read:translate-x-[2px]">&rarr;</span>
+        </a>
+    </div>
+</div>
