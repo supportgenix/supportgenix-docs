@@ -45,3 +45,7 @@ Thumbs.db
 CLAUDE.md
 AGENTS.md
 THEME-SUBMISSION.md
+.internal/
+
+# CLI test scaffolds
+test-supportgenix-docs-*/
