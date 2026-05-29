@@ -7,6 +7,8 @@ import pc from 'picocolors';
 export interface DetectResult {
   astroVersion: string;
   astroConfigFile: string;
+  /** Raw contents of the detected astro.config.* file ('' if unreadable). */
+  astroConfigContents: string;
   hasContentConfig: boolean;
   existingDeps: string[];
   packageJson: Record<string, unknown>;
@@ -97,6 +99,15 @@ export function detect(cwd: string): DetectResult {
     );
   }
 
+  // 4b. Read the astro config contents so callers can check what is actually
+  //     wired in (plugins/integrations), not just what is in package.json.
+  let astroConfigContents = '';
+  try {
+    astroConfigContents = readFileSync(path.join(cwd, astroConfigFile), 'utf-8');
+  } catch {
+    astroConfigContents = '';
+  }
+
   // 5. Check for existing content.config
   const contentConfigExists =
     fs.existsSync(path.join(cwd, 'src', 'content.config.ts')) ||
@@ -106,6 +117,7 @@ export function detect(cwd: string): DetectResult {
   return {
     astroVersion: coerced.version,
     astroConfigFile,
+    astroConfigContents,
     hasContentConfig: contentConfigExists,
     existingDeps: Object.keys(allDeps),
     packageJson,

@@ -9,11 +9,15 @@
 
 - **Astro version:** 6.3.8
 - **Config file:** astro.config.mjs
-- **content.config.ts:** created by installer
+- **content.config.ts:** already existed (see manual step below)
 
 ---
 
 ## Files scaffolded
+
+_No files were written (dry run or all skipped)._
+
+### Skipped (already existed)
 
 - `src/pages/docs/[...slug].astro`
 - `src/pages/docs/category/[category].astro`
@@ -49,14 +53,7 @@
 
 ## Dependencies
 
-### Installed by installer
-
-- `@astrojs/mdx`
-- `@astrojs/alpinejs`
-- `alpinejs`
-- `@tailwindcss/vite`
-- `tailwindcss`
-- `pagefind`
+All required dependencies were already installed.
 
 ---
 
@@ -64,26 +61,26 @@
 
 > These files were **not** modified automatically. Copy the snippets below into your project.
 
-### 1. Update `astro.config.mjs`
+### 1. Add to `src/content.config.ts`
 
-```js
-// Add to your [1mastro.config.mjs[22m:
+Your file already exists. Add the `docs` collection:
 
-import mdx from '@astrojs/mdx';
-import alpinejs from '@astrojs/alpinejs';
-import tailwindcss from '@tailwindcss/vite';
+```ts
+import { defineCollection, z } from 'astro:content';
+import { glob } from 'astro/loaders';
 
-export default defineConfig({
-  integrations: [
-    mdx(),
-    alpinejs(),
-  ],
-  vite: {
-    plugins: [
-      tailwindcss(),
-    ],
-  },
+const docs = defineCollection({
+  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/docs' }),
+  schema: z.object({
+    title: z.string(),
+    description: z.string(),
+    category: z.string(),
+    order: z.number().optional(),
+    draft: z.boolean().optional(),
+  }),
 });
+
+export const collections = { docs };
 ```
 
 ---

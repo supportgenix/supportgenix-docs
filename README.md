@@ -18,8 +18,38 @@ A free, production-ready Astro theme for documentation sites, help centers, and 
 - **Article feedback** — "Was this helpful?" UI (localStorage, no backend needed)
 - **Config-driven** — update brand, links, and social from a single file
 - **Self-hosted fonts** via `@fontsource/poppins`
+- **One-command installer** — drop the docs into any existing Astro 6+ project with `npm create supportgenix-docs@latest`
 
 ## Quick Start
+
+There are two ways to use SupportGenix Docs.
+
+### Option 1 — Add to an existing Astro project (recommended)
+
+Already have an Astro 6+ site? Use the CLI to scaffold a full knowledge base into it in one command:
+
+```bash
+npm create supportgenix-docs@latest
+```
+
+The CLI adds docs pages, namespaced layouts/components/styles under `src/supportgenix-docs/`, an empty `src/content/docs/` folder, and dual-mode search — then prints the manual `astro.config.mjs` / `content.config.ts` snippets it can't auto-merge (also saved to `supportgenix-docs-install.md`).
+
+```bash
+# Install at /docs and skip prompts
+npm create supportgenix-docs@latest -- --path /docs --yes
+
+# Include sample articles
+npm create supportgenix-docs@latest -- --with-examples
+
+# Preview without writing anything
+npm create supportgenix-docs@latest -- --dry-run --yes
+```
+
+See the [`create-supportgenix-docs` package README](./packages/create-supportgenix-docs/README.md) for all flags and details. Package on [npm](https://www.npmjs.com/package/create-supportgenix-docs).
+
+### Option 2 — Clone this repo as a standalone theme
+
+Want a complete, ready-to-deploy docs site? Clone this repository and run it directly.
 
 **Requirements:** Node.js 22.12+ and npm 9.6+
 

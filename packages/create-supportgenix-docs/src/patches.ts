@@ -12,21 +12,38 @@ export interface PatchResult {
 
 const DIVIDER = '─'.repeat(60);
 
+/**
+ * Whether an integration is actually wired into the astro config.
+ * We check the config contents — not just package.json — because a dependency
+ * can be installed without being added to the config, which silently breaks
+ * styles (missing @tailwindcss/vite plugin) or MDX/Alpine.
+ */
+function isWiredInConfig(configContents: string, pkg: string, call: string): boolean {
+  if (!configContents) return false;
+  // Either the import specifier or the plugin/integration call is enough to
+  // consider it wired (covers renamed local imports too).
+  const importRe = new RegExp(
+    `['"\`]${pkg.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&')}['"\`]`
+  );
+  const callRe = new RegExp(`\\b${call}\\s*\\(`);
+  return importRe.test(configContents) || callRe.test(configContents);
+}
+
 /** Snippets the user must add to astro.config.mjs */
-function buildAstroConfigSnippet(existingDeps: string[]): string {
+function buildAstroConfigSnippet(configContents: string): string {
   const imports: string[] = [];
   const integrations: string[] = [];
   const vitePlugins: string[] = [];
 
-  if (!existingDeps.includes('@astrojs/mdx')) {
+  if (!isWiredInConfig(configContents, '@astrojs/mdx', 'mdx')) {
     imports.push(`import mdx from '@astrojs/mdx';`);
     integrations.push('mdx()');
   }
-  if (!existingDeps.includes('@astrojs/alpinejs')) {
+  if (!isWiredInConfig(configContents, '@astrojs/alpinejs', 'alpinejs')) {
     imports.push(`import alpinejs from '@astrojs/alpinejs';`);
     integrations.push('alpinejs()');
   }
-  if (!existingDeps.includes('@tailwindcss/vite')) {
+  if (!isWiredInConfig(configContents, '@tailwindcss/vite', 'tailwindcss')) {
     imports.push(`import tailwindcss from '@tailwindcss/vite';`);
     vitePlugins.push('tailwindcss()');
   }
@@ -97,11 +114,11 @@ export const collections = { docs };
 
 export function applyPatches(
   cwd: string,
-  existingDeps: string[],
+  astroConfigContents: string,
   hasContentConfig: boolean,
   dryRun: boolean
 ): PatchResult {
-  const astroConfigSnippet = buildAstroConfigSnippet(existingDeps);
+  const astroConfigSnippet = buildAstroConfigSnippet(astroConfigContents);
   const contentConfigSnippet = buildContentConfigSnippet();
   let contentConfigCreated = false;
 

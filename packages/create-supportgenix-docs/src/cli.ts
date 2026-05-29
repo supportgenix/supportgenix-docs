@@ -78,7 +78,7 @@ async function main() {
   log.step('Checking config…');
   const patchResult = applyPatches(
     cwd,
-    detectResult.existingDeps,
+    detectResult.astroConfigContents,
     detectResult.hasContentConfig,
     flags.dryRun
   );
